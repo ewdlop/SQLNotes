@@ -1,0 +1,26 @@
+-- First, switch to the master database
+USE master;
+GO
+
+-- Drop all user databases
+DECLARE @dbName NVARCHAR(255);
+
+DECLARE db_cursor CURSOR FOR
+SELECT name
+FROM sys.databases
+WHERE name NOT IN ('master', 'model', 'msdb', 'tempdb');
+
+OPEN db_cursor;
+FETCH NEXT FROM db_cursor INTO @dbName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql NVARCHAR(255);
+    SET @sql = 'DROP DATABASE [' + @dbName + ']';
+    EXEC sp_executesql @sql;
+    FETCH NEXT FROM db_cursor INTO @dbName;
+END
+
+CLOSE db_cursor;
+DEALLOCATE db_cursor;
+GO
