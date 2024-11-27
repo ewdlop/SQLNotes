@@ -196,3 +196,8 @@ Here are some popular JavaScript ORMs:
 - **For Sails.js integration**: Use **Waterline**.
 
 Each ORM has its strengths and weaknesses. Your choice depends on factors like database type, project size, and development style.
+
+
+# SqlLinter/Parser
+
+https://github.com/sqlfluff/sqlfluff
