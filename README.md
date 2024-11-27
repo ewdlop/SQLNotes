@@ -198,6 +198,10 @@ Here are some popular JavaScript ORMs:
 Each ORM has its strengths and weaknesses. Your choice depends on factors like database type, project size, and development style.
 
 
-# SqlLinter/Parser
+# SQL/Sql/Sequl Linter/Parser
+
+https://github.com/microsoft/DacFx
 
 https://github.com/sqlfluff/sqlfluff
+
+https://www.sqlparser.com/snowflake-sql-parser.php
