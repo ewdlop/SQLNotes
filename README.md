@@ -12,6 +12,8 @@ https://learn.microsoft.com/en-us/javascript/api/overview/azure/sql?view=azure-n
 
 # Javascirpt ORM
 
+https://medium.com/@dikibhuyan/how-to-make-your-own-oracle-orm-in-javascript-node-42f97751b10
+
 JavaScript Object-Relational Mapping (ORM) is a technique that allows developers to interact with databases using JavaScript objects rather than raw SQL queries. ORMs simplify database operations, enhance productivity, and improve code readability.
 
 Here are some popular JavaScript ORMs:
