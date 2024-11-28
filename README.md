@@ -1,5 +1,7 @@
 # SQLNotes
 
+https://en.wikipedia.org/wiki/K-anonymity
+
 # ORM
 
 https://www.learndapper.com/
