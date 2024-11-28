@@ -24,7 +24,7 @@ FROM a, b;
 - If tables are large, the result set can grow exponentially, causing performance issues.
 - Generally inefficient and not meaningful unless further filtering (via a `WHERE` clause) is applied.
 
-#### Example with Filtering:
+## Example with Filtering:
 ```sql
 SELECT a.x, b.y
 FROM a, b
