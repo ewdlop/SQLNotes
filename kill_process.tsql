@@ -1,0 +1,33 @@
+USE master;
+
+SELECT * FROM sys.dm_exec_sessions
+WHERE database_id  = db_id('Test')
+
+DECLARE @kill_string varchar(8000) = '';
+SELECT @kill_string = @kill_string + 'KILL ' + str(session_id) + '; '  
+FROM sys.dm_exec_sessions
+WHERE database_id  = db_id('Test') and is_user_process = 1;
+
+EXEC(@kill_string);
+GO
+
+sp_configure 'contained database authentication', 1;  
+GO
+ 
+RECONFIGURE;  
+GO 
+
+SELECT * FROM sys.dm_exec_sessions
+WHERE database_id  = db_id('Test')
+
+ALTER DATABASE Test
+SET containment=partial
+
+USE Test;  
+GO 
+
+CREATE USER Carlo  
+WITH PASSWORD='Enterpwdhere*'  
+
+SELECT containment_desc FROM sys.databases
+WHERE name='Test'
