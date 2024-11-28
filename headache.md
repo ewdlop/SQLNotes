@@ -28,7 +28,7 @@ FROM a, b;
 ```sql
 SELECT a.x, b.y
 FROM a, b
-WHERE a.id = b.a_id;
+WHERE a.id = b.a_id; <--------------------------------------------------------------------
 ```
 - This mimics a `JOIN` but uses explicit filtering in the `WHERE` clause instead of join syntax.
 
