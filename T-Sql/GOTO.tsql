@@ -1,0 +1,20 @@
+DECLARE @Counter INT;
+SET @Counter = 1;
+
+WHILE @Counter < 10
+BEGIN
+    SELECT @Counter;
+    SET @Counter = @Counter + 1;
+    IF @Counter = 4 GOTO Branch_One; -- 跳轉至第一個分支
+    IF @Counter = 5 GOTO Branch_Two;  -- 此行不會執行
+END
+
+Branch_One:
+SELECT '跳轉至分支一。';
+GOTO Branch_Three; -- 這將防止執行 Branch_Two
+
+Branch_Two:
+SELECT '跳轉至分支二。';
+
+Branch_Three:
+SELECT '跳轉至分支三。';
