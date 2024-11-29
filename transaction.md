@@ -26,4 +26,6 @@ https://github.blog/news-insights/git-concurrency-in-github-desktop/?utm_source=
 
 # Challenge notes:
 
-Build a platform to allow million user to query live among a table with billions row in seconds or less in a RElational Database
+~Build a platform to allow million user to query live among a table with billions row in seconds or less in a RElational Database~
+
+Build a platform that allows millions of users to query a live relational database table containing billions of rows in seconds or less
