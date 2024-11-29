@@ -1,0 +1,42 @@
+-- https://dba.stackexchange.com/questions/51861/how-to-create-implicit-select-statements
+
+
+
+CREATE TABLE dbo.tbl1(c1 INT, c2 INT, c3 INT);
+CREATE TABLE dbo.tbl2(c4 INT, c5 INT, c6 INT);
+CREATE TABLE dbo.tbl3(c7 INT, c8 INT, c9 INT);
+
+SELECT 
+  QUOTENAME(OBJECT_SCHEMA_NAME(T.object_id))+'.'+
+  QUOTENAME(OBJECT_NAME(T.object_id)) AS quoted_table_name,
+  T.object_id
+FROM sys.tables AS T;
+
+SELECT C.name,C.column_id 
+  FROM sys.columns AS C
+ WHERE C.object_id = OBJECT_ID('dbo.tbl1');
+
+SELECT STUFF((
+  SELECT ','+QUOTENAME(name)
+    FROM sys.columns AS C
+   WHERE C.object_id = OBJECT_ID('dbo.tbl1')
+   ORDER BY C.column_id
+     FOR XML PATH(''),TYPE
+  ).value('.','NVARCHAR(MAX)'),1,1,'') AS clomun_list;
+
+SELECT 'SELECT ' +
+       CL.column_list +
+       ' FROM ' +
+       QUOTENAME(OBJECT_SCHEMA_NAME(T.object_id)) + '.' +
+       QUOTENAME(OBJECT_NAME(T.object_id)) +
+       ';' AS select_statement
+FROM sys.tables AS T
+CROSS APPLY (
+  SELECT STUFF((
+    SELECT ','+QUOTENAME(name)
+      FROM sys.columns AS C
+     WHERE C.object_id = T.object_id
+     ORDER BY C.column_id
+       FOR XML PATH(''),TYPE
+    ).value('.','NVARCHAR(MAX)'),1,1,'') AS column_list
+  )CL;
