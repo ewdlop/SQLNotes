@@ -24,3 +24,6 @@ also how to recover from crash during recovery!!!
 
 https://github.blog/news-insights/git-concurrency-in-github-desktop/?utm_source=chatgpt.com
 
+# Challenge notes:
+
+Build a platform to allow million user to query live among a table with billions row in seconds or less in a RElational Database
