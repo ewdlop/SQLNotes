@@ -1,0 +1,15 @@
+-- Create a temporal table
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    department VARCHAR(100),
+    valid_time PERIOD
+);
+
+-- Insert data with valid time
+INSERT INTO employees (name, department, valid_time)
+VALUES ('Alice', 'Engineering', '[2023-01-01, 2023-12-31)');
+
+-- Query data as of a specific valid time
+SELECT * FROM employees
+WHERE '2023-06-01' <@ valid_time;
