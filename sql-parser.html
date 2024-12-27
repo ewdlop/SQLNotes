@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Parser</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #output { margin-top: 20px; font-weight: bold; color: #333; }
+  </style>
+</head>
+<body>
+
+  <h2>SQL Query Parser</h2>
+  <p>Enter a basic SQL query (SELECT, INSERT, UPDATE, or DELETE):</p>
+
+  <textarea id="sqlInput" rows="5" cols="50" placeholder="Enter SQL Query here..."></textarea><br><br>
+  <button onclick="parseSQL()">Parse SQL</button>
+
+  <div id="output"></div>
+
+  <script>
+    function parseSQL() {
+      const query = document.getElementById("sqlInput").value.trim();
+      let output = "";
+
+      // Simple parsing function based on the BNF rules above
+      if (query.match(/^SELECT\s+.*\s+FROM\s+.*(;)?$/i)) {
+        output = parseSelect(query);
+      } else if (query.match(/^INSERT INTO\s+.*\s+VALUES\s+\(.*\)(;)?$/i)) {
+        output = parseInsert(query);
+      } else if (query.match(/^UPDATE\s+.*\s+SET\s+.*(;)?$/i)) {
+        output = parseUpdate(query);
+      } else if (query.match(/^DELETE FROM\s+.*(;)?$/i)) {
+        output = parseDelete(query);
+      } else {
+        output = "Invalid SQL query. Please enter a valid SELECT, INSERT, UPDATE, or DELETE statement.";
+      }
+
+      document.getElementById("output").innerText = output;
+    }
+
+    function parseSelect(query) {
+      const selectPattern = /^SELECT\s+(.*)\s+FROM\s+(\w+)\s*(WHERE\s+(.+))?$/i;
+      const match = query.match(selectPattern);
+      if (!match) return "Invalid SELECT statement.";
+      
+      const columns = match[1];
+      const table = match[2];
+      const condition = match[4] || "None";
+
+      return `Parsed SELECT Query:
+      - Columns: ${columns}
+      - Table: ${table}
+      - Condition: ${condition}`;
+    }
+
+    function parseInsert(query) {
+      const insertPattern = /^INSERT INTO\s+(\w+)\s+\((.*)\)\s+VALUES\s+\((.*)\)$/i;
+      const match = query.match(insertPattern);
+      if (!match) return "Invalid INSERT statement.";
+      
+      const table = match[1];
+      const columns = match[2];
+      const values = match[3];
+
+      return `Parsed INSERT Query:
+      - Table: ${table}
+      - Columns: ${columns}
+      - Values: ${values}`;
+    }
+
+    function parseUpdate(query) {
+      const updatePattern = /^UPDATE\s+(\w+)\Vs+SET\s+(.*)\s*(WHERE\s+(.+))?$/i;
+      const match = query.match(updatePattern);
+      if (!match) return "Invalid UPDATE statement.";
+      
+      const table = match[1];
+      const assignments = match[2];
+      const condition = match[4] || "None";
+
+      return `Parsed UPDATE Query:
+      - Table: ${table}
+      - Assignments: ${assignments}
+      - Condition: ${condition}`;
+    }
+
+    function parseDelete(query) {
+      const deletePattern = /^DELETE FROM\s+(\w+)\s*(WHERE\s+(.+))?$/i;
+      const match = query.match(deletePattern);
+      if (!match) return "Invalid DELETE statement.";
+      
+      const table = match[1];
+      const condition = match[3] || "None";
+
+      return `Parsed DELETE Query:
+      - Table: ${table}
+      - Condition: ${condition}`;
+    }
+  </script>
+
+</body>
+</html>
+s
