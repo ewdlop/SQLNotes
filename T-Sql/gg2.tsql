@@ -1,3 +1,7 @@
+-- This script is used to drop all user databases in SQL Server.
+-- It switches to the master database, then iterates through all user databases
+-- and drops each one.
+
 USE master;
 GO
 
