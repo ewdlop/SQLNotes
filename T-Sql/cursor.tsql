@@ -1,0 +1,26 @@
+DECLARE @EmployeeID INT, @FirstName NVARCHAR(50), @LastName NVARCHAR(50);
+
+-- Declare the cursor
+DECLARE employee_cursor CURSOR FOR
+SELECT EmployeeID, FirstName, LastName
+FROM Employees;
+
+-- Open the cursor
+OPEN employee_cursor;
+
+-- Fetch the first row
+FETCH NEXT FROM employee_cursor INTO @EmployeeID, @FirstName, @LastName;
+
+-- Loop through the result set
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    -- Print the current row
+    PRINT 'EmployeeID: ' + CAST(@EmployeeID AS NVARCHAR(10)) + ', Name: ' + @FirstName + ' ' + @LastName;
+
+    -- Fetch the next row
+    FETCH NEXT FROM employee_cursor INTO @EmployeeID, @FirstName, @LastName;
+END
+
+-- Close and deallocate the cursor
+CLOSE employee_cursor;
+DEALLOCATE employee_cursor;
