@@ -1,0 +1,26 @@
+DECLARE @Value INT = 10;
+
+IF @Value > 5
+BEGIN
+    PRINT 'Value is greater than 5';
+END
+ELSE
+BEGIN
+    PRINT 'Value is 5 or less';
+END
+
+DECLARE @Counter INT = 1;
+
+WHILE @Counter <= 5
+BEGIN
+    PRINT 'Counter value is ' + CAST(@Counter AS NVARCHAR(10));
+    SET @Counter = @Counter + 1;
+END
+
+SELECT EmployeeID, FirstName, LastName, Salary,
+    CASE 
+        WHEN Salary > 70000 THEN 'High'
+        WHEN Salary BETWEEN 50000 AND 70000 THEN 'Medium'
+        ELSE 'Low'
+    END AS SalaryCategory
+FROM Employees;
