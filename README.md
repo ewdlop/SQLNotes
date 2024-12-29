@@ -1,5 +1,11 @@
 # SQLNotes
 
+## K-anonymity
+
+> *True privacy in K-anonymity is not just about hiding in a crowd; it’s about ensuring no individual can be singled out, even when the data is combined, probed, or deconstructed.*
+
+[K-anonymity](https://en.wikipedia.org/wiki/K-anonymity)
+
 ## Overview
 
 This repository contains various SQL scripts, T-SQL scripts, and documentation files. Below is a summary of each file and its purpose:
