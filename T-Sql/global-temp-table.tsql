@@ -1,0 +1,19 @@
+-- Create a global temporary table
+CREATE TABLE ##GlobalTempEmployee (
+    EmployeeID INT,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+
+-- Insert data into the global temporary table
+INSERT INTO ##GlobalTempEmployee (EmployeeID, FirstName, LastName, Salary)
+VALUES
+(1, 'Alice', 'Johnson', 80000.00),
+(2, 'Bob', 'Lee', 90000.00);
+
+-- Select data from the global temporary table
+SELECT * FROM ##GlobalTempEmployee;
+
+-- Drop the global temporary table when done
+DROP TABLE ##GlobalTempEmployee;
