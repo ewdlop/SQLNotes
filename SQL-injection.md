@@ -17,6 +17,6 @@ Here are some common internal questions and appropriate responses:
 By understanding and utilizing the tools and practices provided by SQL Server, developers can build secure applications that are resistant to SQL injection attacks.
 
 
-me:
+me: i meant they have time to add all the ai feature, geo feature, json featues all that database features steal from other tech
 
-i meant they have time to add all the ai feature, geo feature, json featues all that database features steal from other tech
+CEO: security doesn't make money
