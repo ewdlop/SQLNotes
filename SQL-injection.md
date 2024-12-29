@@ -15,3 +15,8 @@ Here are some common internal questions and appropriate responses:
    - While SQL Server itself does not automatically reject dangerous queries, developers can implement input validation and use application-level firewalls or database firewalls to monitor and block malicious queries.
 
 By understanding and utilizing the tools and practices provided by SQL Server, developers can build secure applications that are resistant to SQL injection attacks.
+
+
+me:
+
+i meant they have time to add all the ai feature, geo feature, json featues all that database features steal from other tech
