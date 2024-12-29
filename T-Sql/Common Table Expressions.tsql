@@ -1,0 +1,56 @@
+WITH CTE_Name (Column1, Column2, ...)
+AS
+(
+    -- CTE Query
+    SELECT Column1, Column2, ...
+    FROM TableName
+    WHERE Condition
+)
+-- Using the CTE in a query
+SELECT Column1, Column2, ...
+FROM CTE_Name
+WHERE Condition;
+
+-- Create a CTE to select high earning employees
+WITH HighEarningEmployees AS
+(
+    SELECT EmployeeID, FirstName, LastName, Salary
+    FROM Employees
+    WHERE Salary > 50000
+)
+-- Use the CTE to display results
+SELECT EmployeeID, FirstName, LastName, Salary
+FROM HighEarningEmployees;
+
+-- Recursive CTE to get the hierarchy of employees
+WITH EmployeeHierarchy AS
+(
+    -- Anchor member: select the top-level managers
+    SELECT EmployeeID, FirstName, LastName, ManagerID, 0 AS Level
+    FROM Employees
+    WHERE ManagerID IS NULL
+
+    UNION ALL
+
+    -- Recursive member: select employees managed by the managers selected in the previous step
+    SELECT e.EmployeeID, e.FirstName, e.LastName, e.ManagerID, eh.Level + 1
+    FROM Employees e
+    INNER JOIN EmployeeHierarchy eh ON e.ManagerID = eh.EmployeeID
+)
+-- Use the CTE to display the employee hierarchy
+SELECT EmployeeID, FirstName, LastName, ManagerID, Level
+FROM EmployeeHierarchy
+ORDER BY Level, ManagerID, EmployeeID;
+
+-- Create a CTE to select employees with low salaries
+WITH LowSalaries AS
+(
+    SELECT EmployeeID, Salary
+    FROM Employees
+    WHERE Salary < 30000
+)
+-- Use the CTE to update the salaries
+UPDATE Employees
+SET Salary = Salary * 1.1
+FROM Employees e
+INNER JOIN LowSalaries ls ON e.EmployeeID = ls.EmployeeID;
