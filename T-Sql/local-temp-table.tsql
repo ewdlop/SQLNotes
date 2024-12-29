@@ -1,0 +1,28 @@
+-- Create a local temporary table
+CREATE TABLE #TempEmployee (
+    EmployeeID INT,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+
+-- Insert data into the temporary table
+INSERT INTO #TempEmployee (EmployeeID, FirstName, LastName, Salary)
+VALUES
+(1, 'John', 'Doe', 50000.00),
+(2, 'Jane', 'Smith', 60000.00),
+(3, 'Jim', 'Brown', 70000.00);
+
+-- Select data from the temporary table
+SELECT * FROM #TempEmployee;
+
+-- Update data in the temporary table
+UPDATE #TempEmployee
+SET Salary = Salary * 1.1
+WHERE EmployeeID = 1;
+
+-- Select updated data
+SELECT * FROM #TempEmployee;
+
+-- Drop the temporary table when done
+DROP TABLE #TempEmployee;
