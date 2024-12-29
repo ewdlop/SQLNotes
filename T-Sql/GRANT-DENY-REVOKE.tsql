@@ -1,0 +1,29 @@
+GRANT SELECT ON dbo.MyTable TO MyUser;
+
+GRANT INSERT ON dbo.MyTable TO MyUser;
+
+DENY DELETE ON dbo.MyTable TO MyUser;
+
+GRANT SELECT (Column1, Column2) ON dbo.MyTable TO MyUser;
+
+DENY SELECT (SensitiveColumn) ON dbo.MyTable TO MyUser;
+
+-- Create the table
+CREATE TABLE dbo.Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+
+-- Create the user
+CREATE USER MyUser FOR LOGIN MyLogin;
+
+-- Grant permissions
+GRANT SELECT ON dbo.Employees TO MyUser;
+DENY SELECT (Salary) ON dbo.Employees TO MyUser;
+GRANT INSERT (FirstName, LastName) ON dbo.Employees TO MyUser;
+
+REVOKE SELECT ON dbo.MyTable FROM MyUser;
+
+REVOKE SELECT (Column1, Column2) ON dbo.MyTable FROM MyUser;
