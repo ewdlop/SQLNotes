@@ -1,5 +1,6 @@
 --https://learn.microsoft.com/en-us/sql/t-sql/functions/openrowset-transact-sql?view=sql-server-ver16
 
+-- This example demonstrates using OPENROWSET to query data from an Access database file.
 USE Northwind;
 GO
 
@@ -10,10 +11,9 @@ INNER JOIN OPENROWSET(
         'C:\Program Files\Microsoft Office\OFFICE11\SAMPLES\Northwind.mdb';'admin';'', --server file system
         Orders) AS o
     ON c.CustomerID = o.CustomerID;
-
 GO 
 
-
+-- This example demonstrates using OPENROWSET to import a file into a SQL Server table.
 CREATE TABLE myTable (
     FileName NVARCHAR(60),
     FileType NVARCHAR(60),
@@ -35,6 +35,7 @@ FROM OPENROWSET(
 ) AS Document;
 GO
 
+-- This example demonstrates using OPENROWSET to query data from an S3 bucket.
 CREATE DATABASE SCOPED CREDENTIAL s3_dsc
 WITH IDENTITY = 'S3 Access Key',
 SECRET = 'contosoadmin:contosopwd';
@@ -56,9 +57,9 @@ SELECT * FROM OPENROWSET(
     FORMAT = 'PARQUET',
     DATA_SOURCE = 's3_eds'
 ) AS data;
-
 GO 
 
+-- This example demonstrates using OPENROWSET to query data from an Azure Data Lake Storage (ADLS) account.
 CREATE DATABASE SCOPED CREDENTIAL delta_storage_dsc
 WITH IDENTITY = 'SHARED ACCESS SIGNATURE',
 SECRET = '<SAS Token>';
@@ -75,5 +76,4 @@ FROM OPENROWSET(
     FORMAT = 'DELTA',
     DATA_SOURCE = 'Delta_ED'
 ) AS result;
-
 GO

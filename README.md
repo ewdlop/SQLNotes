@@ -1,18 +1,105 @@
 # SQLNotes
 
-https://en.wikipedia.org/wiki/K-anonymity
+## Overview
 
-# ORM
+This repository contains various SQL scripts, T-SQL scripts, and documentation files. Below is a summary of each file and its purpose:
+
+- `.Net/quick_setup.tsql`: SQL scripts for creating and managing a database named `MySchool`.
+- `ADONET/SqlInjectionPrevention.cs`: C# class for preventing SQL injection using parameterized queries.
+- `README.md`: Provides links to various resources related to SQL, ORM, and SQL linters/parsers.
+- `T-Sql/gg.tsql`: Script for dropping all user databases in SQL Server.
+- `T-Sql/gg2.tsql`: Script for dropping all user databases in SQL Server.
+- `T-Sql/OPENROWSET_example.tsql`: Examples of using the `OPENROWSET` function in SQL Server.
+
+## Setting Up and Using SQL Scripts
+
+### .Net/quick_setup.tsql
+
+This file includes SQL scripts for creating and managing a database named `MySchool`. To set up the database, follow these steps:
+
+1. Open SQL Server Management Studio (SSMS).
+2. Connect to your SQL Server instance.
+3. Open the `quick_setup.tsql` file.
+4. Execute the script to create the `MySchool` database and its associated objects.
+
+### T-Sql/gg.tsql and T-Sql/gg2.tsql
+
+These files contain scripts for dropping all user databases in SQL Server. To use these scripts:
+
+1. Open SQL Server Management Studio (SSMS).
+2. Connect to your SQL Server instance.
+3. Open the `gg.tsql` or `gg2.tsql` file.
+4. Execute the script to drop all user databases.
+
+### T-Sql/OPENROWSET_example.tsql
+
+This file provides examples of using the `OPENROWSET` function in SQL Server. To use these examples:
+
+1. Open SQL Server Management Studio (SSMS).
+2. Connect to your SQL Server instance.
+3. Open the `OPENROWSET_example.tsql` file.
+4. Execute the script to see examples of using the `OPENROWSET` function.
+
+## SQL Injection Prevention
+
+The `ADONET/SqlInjectionPrevention.cs` file contains a C# class for preventing SQL injection using parameterized queries. It demonstrates how to use parameterized queries to avoid SQL injection vulnerabilities. Here is an example of how to use the `SqlInjectionPrevention` class:
+
+```csharp
+using System;
+using System.Data.SqlClient;
+
+string connectionString = "your-database-connection-string";
+SqlInjectionPrevention prevention = new SqlInjectionPrevention(connectionString);
+prevention.GetUserDetails("testuser");
+
+public class SqlInjectionPrevention
+{
+    private string connectionString;
+
+    public SqlInjectionPrevention(string connectionString)
+    {
+        this.connectionString = connectionString;
+    }
+
+    public void GetUserDetails(string username)
+    {
+        string query = "SELECT * FROM Users WHERE Username = @Username";
+
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            SqlCommand command = new SqlCommand(query, connection);
+            // Use parameterized query to prevent SQL injection
+            command.Parameters.AddWithValue("@Username", username);
+
+            connection.Open();
+            SqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Console.WriteLine($"Username: {reader["Username"]}, Email: {reader["Email"]}");
+            }
+        }
+    }
+}
+```
+
+## Using TSqlParser for Parsing and Analyzing SQL Scripts
+
+The `T-Sql/TSqlParser.md` file provides a detailed explanation of the `TSqlParser` class and its usage. The `TSqlParser` class from the Microsoft.Data.Tools.Schema.Sql library is used to parse T-SQL scripts. This can be useful for analyzing SQL scripts, including detecting potential SQL injection vulnerabilities by examining the structure and content of the queries.
+
+For more details and examples, refer to the `T-Sql/TSqlParser.md` file.
+
+## ORM
 
 https://www.learndapper.com/
 
 https://learn.microsoft.com/en-us/ef/core/
 
-# SDK
+## SDK
 
 https://learn.microsoft.com/en-us/javascript/api/overview/azure/sql?view=azure-node-latest
 
-# Javascirpt ORM
+## JavaScript ORM
 
 https://medium.com/@dikibhuyan/how-to-make-your-own-oracle-orm-in-javascript-node-42f97751b10
 
@@ -200,7 +287,6 @@ Here are some popular JavaScript ORMs:
 - **For Sails.js integration**: Use **Waterline**.
 
 Each ORM has its strengths and weaknesses. Your choice depends on factors like database type, project size, and development style.
-
 
 # SQL/Sql/Sequl Linter/Parser
 
