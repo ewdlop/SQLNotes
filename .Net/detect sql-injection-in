@@ -1,0 +1,5 @@
+#grab https://learn.microsoft.com/en-us/dotnet/api/microsoft.sqlserver.transactsql.scriptdom.tsql150parser?view=sql-transactsql-161
+
+# and see if the tsql parser can parse the user input string successfully
+
+# and 
