@@ -1,0 +1,38 @@
+CREATE EXTENSION IF NOT EXISTS hyperloglog;
+
+CREATE OR REPLACE PROCEDURE hll_add_element(
+  hll_counter_name TEXT,
+  element TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  EXECUTE format('
+    INSERT INTO hll_counters (name, hll)
+    VALUES (%L, hll_add(hll_empty(), hll_hash_text(%L)))
+    ON CONFLICT (name) DO UPDATE
+    SET hll = hll_union(hll_counters.hll, excluded.hll)
+  ', hll_counter_name, element);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION hll_get_estimate(
+  hll_counter_name TEXT
+)
+RETURNS BIGINT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  estimate BIGINT;
+BEGIN
+  SELECT hll_cardinality(hll) INTO estimate
+  FROM hll_counters
+  WHERE name = hll_counter_name;
+  RETURN estimate;
+END;
+$$;
+
+-- CALL hll_add_element('user_visits', 'user123');
+-- SELECT hll_get_estimate('user_visits');
+
+COMMENT ON VIEW hll_counters IS 'This is a view.';
