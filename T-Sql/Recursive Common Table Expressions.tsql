@@ -1,0 +1,24 @@
+use master
+
+WITH numbers AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM numbers WHERE n < 1000
+)
+SELECT * FROM numbers
+OPTION (MAXRECURSION 1000);
+GO
+
+WITH numbers AS (
+    -- Base Case: Start with 1
+    SELECT 1 AS n
+    UNION ALL
+    -- Recursive Case: Increment the number until 10
+    SELECT n + 1 
+    FROM numbers 
+    WHERE n < 10
+)
+SELECT * FROM numbers
+OPTION (MAXRECURSION 10);  -- Prevent infinite recursion
+
+GO
