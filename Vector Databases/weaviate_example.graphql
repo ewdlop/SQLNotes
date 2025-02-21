@@ -1,0 +1,24 @@
+# Insert objects with vectors
+mutation {
+  AddExampleCollection(id: "vector_id_1", vector: [0.1, 0.2, 0.3, ..., 0.128]) {
+    id
+  }
+  AddExampleCollection(id: "vector_id_2", vector: [0.2, 0.3, 0.4, ..., 0.129]) {
+    id
+  }
+}
+
+# Query vectors
+{
+  Get {
+    ExampleCollection(
+      nearVector: {
+        vector: [0.1, 0.2, 0.3, ..., 0.128],
+        certainty: 0.7
+      }
+    ) {
+      id
+      vector
+    }
+  }
+}
