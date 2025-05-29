@@ -167,7 +167,9 @@ VALUES (501, 3, '2023-12-15', 4.5, 1, 'Excellent performance in sales targets. G
 INSERT INTO PERFORMANCE_REVIEW(reviewId, empId, reviewDate, rating, reviewerEmpId, comments) 
 VALUES (502, 6, '2023-12-16', 4.2, 1, 'Consistently meets targets. Could improve on documentation.');
 
-
+-- ========================================
+-- SELECT QUERIES
+-- ========================================
 -- Sample queries
 -- Find all employees in Sales department
 SELECT * FROM EMPLOYEE WHERE dept = 'Sales';
@@ -191,3 +193,365 @@ FROM EMPLOYEE e
 LEFT JOIN ATTENDANCE a ON e.empId = a.empId
 WHERE MONTH(a.workDate) = MONTH(GETDATE()) AND YEAR(a.workDate) = YEAR(GETDATE())
 GROUP BY e.name;
+-- ========================================
+-- ALTER TABLE / UPDATE COLUMN TYPE QUERIES
+-- ========================================
+
+-- Increase the size of varchar columns
+ALTER TABLE DEPARTMENT ALTER COLUMN deptName VARCHAR(50);
+ALTER TABLE DEPARTMENT ALTER COLUMN location VARCHAR(100);
+
+-- Change email column to accommodate longer email addresses
+ALTER TABLE EMPLOYEE ALTER COLUMN email VARCHAR(100);
+
+-- Expand project name and status fields
+ALTER TABLE PROJECT ALTER COLUMN projectName VARCHAR(100);
+ALTER TABLE PROJECT ALTER COLUMN status VARCHAR(25);
+
+-- Increase performance review comments field
+ALTER TABLE PERFORMANCE_REVIEW ALTER COLUMN comments VARCHAR(1000);
+
+-- Add new columns to existing tables
+ALTER TABLE EMPLOYEE ADD isActive BIT DEFAULT 1;
+ALTER TABLE EMPLOYEE ADD terminationDate DATE NULL;
+
+ALTER TABLE PROJECT ADD projectManager INT NULL;
+ALTER TABLE PROJECT ADD FOREIGN KEY (projectManager) REFERENCES EMPLOYEE(empId);
+
+ALTER TABLE DEPARTMENT ADD budget DECIMAL(15,2) NULL;
+
+-- For SQL Server, to change data type of a column with data:
+-- First, create a new column with the desired type
+ALTER TABLE PROJECT_ASSIGNMENT ADD hoursAllocatedNew DECIMAL(7,2);
+-- Copy data from old column to new column
+UPDATE PROJECT_ASSIGNMENT SET hoursAllocatedNew = hoursAllocated;
+-- Drop the old column
+ALTER TABLE PROJECT_ASSIGNMENT DROP COLUMN hoursAllocated;
+-- Rename the new column to the original name
+EXEC sp_rename 'PROJECT_ASSIGNMENT.hoursAllocatedNew', 'hoursAllocated', 'COLUMN';
+
+
+-- ========================================
+-- COMPLEX SELECT QUERIES WITH CTEs
+-- ========================================
+
+-- 1. Employee Hierarchy with Recursive CTE
+WITH EmployeeHierarchy AS (
+    -- Anchor member: Top-level managers
+    SELECT empId, name, managerId, jobTitle, 0 as Level
+    FROM EMPLOYEE
+    WHERE managerId IS NULL
+    
+    UNION ALL
+    
+    -- Recursive member: Employees under managers
+    SELECT e.empId, e.name, e.managerId, e.jobTitle, eh.Level + 1
+    FROM EMPLOYEE e
+    INNER JOIN EmployeeHierarchy eh ON e.managerId = eh.empId
+)
+SELECT empId, name, jobTitle, Level,
+       REPLICATE('  ', Level) + name AS HierarchicalName
+FROM EmployeeHierarchy
+ORDER BY Level, name;
+
+
+-- 2. Department Performance Analysis with Multiple CTEs
+WITH DeptSalary AS (
+    SELECT d.deptId, d.deptName, 
+           AVG(s.amount) as avgSalary,
+           MIN(s.amount) as minSalary,
+           MAX(s.amount) as maxSalary,
+           COUNT(e.empId) as empCount
+    FROM DEPARTMENT d
+    JOIN EMPLOYEE e ON d.deptId = e.deptId
+    JOIN SALARY s ON e.empId = s.empId
+    GROUP BY d.deptId, d.deptName
+),
+DeptProjects AS (
+    SELECT d.deptId,
+           COUNT(DISTINCT p.projectId) as projectCount,
+           SUM(p.budget) as totalBudget,
+           AVG(p.budget) as avgProjectBudget
+    FROM DEPARTMENT d
+    LEFT JOIN PROJECT p ON d.deptId = p.deptId
+    GROUP BY d.deptId
+)
+SELECT ds.deptName,
+       ds.empCount,
+       ds.avgSalary,
+       ds.minSalary,
+       ds.maxSalary,
+       COALESCE(dp.projectCount, 0) as projectCount,
+       COALESCE(dp.totalBudget, 0) as totalProjectBudget,
+       COALESCE(dp.avgProjectBudget, 0) as avgProjectBudget
+FROM DeptSalary ds
+LEFT JOIN DeptProjects dp ON ds.deptId = dp.deptId
+ORDER BY ds.avgSalary DESC;
+
+
+-- 3. Employee Workload Analysis
+WITH EmployeeProjects AS (
+    SELECT e.empId, e.name, e.deptId,
+           COUNT(pa.projectId) as projectCount,
+           SUM(pa.hoursAllocated) as totalHours
+    FROM EMPLOYEE e
+    LEFT JOIN PROJECT_ASSIGNMENT pa ON e.empId = pa.empId
+    GROUP BY e.empId, e.name, e.deptId
+),
+ProjectDetails AS (
+    SELECT pa.empId,
+           STRING_AGG(p.projectName, ', ') as projectList
+    FROM PROJECT_ASSIGNMENT pa
+    JOIN PROJECT p ON pa.projectId = p.projectId
+    GROUP BY pa.empId
+)
+SELECT ep.name,
+       d.deptName,
+       ep.projectCount,
+       ep.totalHours,
+       pd.projectList,
+       CASE 
+           WHEN ep.totalHours > 40 THEN 'Overallocated'
+           WHEN ep.totalHours BETWEEN 30 AND 40 THEN 'Fully Allocated'
+           WHEN ep.totalHours BETWEEN 15 AND 29 THEN 'Partially Allocated'
+           ELSE 'Underallocated'
+       END as AllocationStatus
+FROM EmployeeProjects ep
+JOIN DEPARTMENT d ON ep.deptId = d.deptId
+LEFT JOIN ProjectDetails pd ON ep.empId = pd.empId
+ORDER BY ep.totalHours DESC;
+
+
+-- 4. Salary Ranking within Departments
+WITH SalaryRanking AS (
+    SELECT e.empId, e.name, d.deptName, s.amount,
+           RANK() OVER (PARTITION BY d.deptId ORDER BY s.amount DESC) as salaryRank,
+           DENSE_RANK() OVER (PARTITION BY d.deptId ORDER BY s.amount DESC) as denseRank,
+           ROW_NUMBER() OVER (PARTITION BY d.deptId ORDER BY s.amount DESC) as rowNum,
+           PERCENT_RANK() OVER (PARTITION BY d.deptId ORDER BY s.amount DESC) as percentRank
+    FROM EMPLOYEE e
+    JOIN DEPARTMENT d ON e.deptId = d.deptId
+    JOIN SALARY s ON e.empId = s.empId
+)
+SELECT name, deptName, amount,
+       salaryRank,
+       CASE 
+           WHEN percentRank <= 0.25 THEN 'Top 25%'
+           WHEN percentRank <= 0.50 THEN 'Top 50%'
+           WHEN percentRank <= 0.75 THEN 'Top 75%'
+           ELSE 'Bottom 25%'
+       END as SalaryPercentile
+FROM SalaryRanking
+ORDER BY deptName, salaryRank;
+
+
+-- 5. Project Timeline Analysis
+WITH ProjectStatus AS (
+    SELECT projectId, projectName, 
+           startDate, endDate, budget, status,
+           DATEDIFF(day, startDate, endDate) as durationDays,
+           DATEDIFF(day, startDate, GETDATE()) as daysElapsed,
+           CASE 
+               WHEN endDate < GETDATE() AND status != 'Completed' THEN 'Overdue'
+               WHEN endDate >= GETDATE() AND status = 'In Progress' THEN 'On Track'
+               WHEN status = 'Completed' THEN 'Completed'
+               ELSE 'Not Started'
+           END as ProjectHealth
+    FROM PROJECT
+),
+ProjectTeam AS (
+    SELECT p.projectId,
+           COUNT(DISTINCT pa.empId) as teamSize,
+           SUM(pa.hoursAllocated) as totalAllocatedHours
+    FROM PROJECT p
+    LEFT JOIN PROJECT_ASSIGNMENT pa ON p.projectId = pa.projectId
+    GROUP BY p.projectId
+)
+SELECT ps.projectName,
+       ps.status,
+       ps.ProjectHealth,
+       ps.durationDays,
+       ps.daysElapsed,
+       CAST(ps.daysElapsed * 100.0 / NULLIF(ps.durationDays, 0) AS DECIMAL(5,2)) as PercentComplete,
+       ps.budget,
+       pt.teamSize,
+       pt.totalAllocatedHours
+FROM ProjectStatus ps
+LEFT JOIN ProjectTeam pt ON ps.projectId = pt.projectId
+ORDER BY ps.ProjectHealth DESC, ps.endDate;
+
+
+-- 6. Employee Tenure and Salary Growth Analysis
+WITH EmployeeTenure AS (
+    SELECT empId, name, hireDate,
+           DATEDIFF(year, hireDate, GETDATE()) as yearsOfService,
+           DATEDIFF(month, hireDate, GETDATE()) as monthsOfService
+    FROM EMPLOYEE
+),
+SalaryHistory AS (
+    SELECT et.empId, et.name, et.yearsOfService,
+           s.amount as currentSalary,
+           s.amount / NULLIF(et.yearsOfService, 0) as avgYearlyIncrease
+    FROM EmployeeTenure et
+    JOIN SALARY s ON et.empId = s.empId
+)
+SELECT name, yearsOfService, currentSalary,
+       COALESCE(avgYearlyIncrease, currentSalary) as avgYearlyIncrease,
+       CASE 
+           WHEN yearsOfService < 2 THEN 'New Employee'
+           WHEN yearsOfService BETWEEN 2 AND 5 THEN 'Mid-Level'
+           ELSE 'Senior Employee'
+       END as TenureCategory
+FROM SalaryHistory
+ORDER BY yearsOfService DESC;
+
+
+-- 7. Department Cross-Analysis
+WITH DepartmentMetrics AS (
+    SELECT d.deptId, d.deptName,
+           COUNT(DISTINCT e.empId) as employeeCount,
+           COUNT(DISTINCT p.projectId) as projectCount,
+           COALESCE(SUM(p.budget), 0) as totalProjectBudget,
+           AVG(s.amount) as avgSalary
+    FROM DEPARTMENT d
+    LEFT JOIN EMPLOYEE e ON d.deptId = e.deptId
+    LEFT JOIN PROJECT p ON d.deptId = p.deptId
+    LEFT JOIN SALARY s ON e.empId = s.empId
+    GROUP BY d.deptId, d.deptName
+),
+DepartmentEfficiency AS (
+    SELECT deptId,
+           CASE 
+               WHEN employeeCount > 0 THEN totalProjectBudget / employeeCount 
+               ELSE 0 
+           END as budgetPerEmployee,
+           CASE 
+               WHEN projectCount > 0 THEN employeeCount * 1.0 / projectCount 
+               ELSE 0 
+           END as employeesPerProject
+    FROM DepartmentMetrics
+)
+SELECT dm.deptName,
+       dm.employeeCount,
+       dm.projectCount,
+       dm.totalProjectBudget,
+       dm.avgSalary,
+       de.budgetPerEmployee,
+       de.employeesPerProject
+FROM DepartmentMetrics dm
+JOIN DepartmentEfficiency de ON dm.deptId = de.deptId
+ORDER BY dm.totalProjectBudget DESC;
+
+
+-- 8. Performance Review Insights
+WITH ReviewStats AS (
+    SELECT e.empId, e.name, e.deptId,
+           COUNT(pr.reviewId) as reviewCount,
+           AVG(pr.rating) as avgRating,
+           MIN(pr.rating) as minRating,
+           MAX(pr.rating) as maxRating
+    FROM EMPLOYEE e
+    LEFT JOIN PERFORMANCE_REVIEW pr ON e.empId = pr.empId
+    GROUP BY e.empId, e.name, e.deptId
+),
+DeptAvgRating AS (
+    SELECT deptId,
+           AVG(avgRating) as deptAvgRating
+    FROM ReviewStats
+    WHERE avgRating IS NOT NULL
+    GROUP BY deptId
+)
+SELECT rs.name,
+       d.deptName,
+       rs.reviewCount,
+       rs.avgRating,
+       dar.deptAvgRating,
+       CASE 
+           WHEN rs.avgRating > dar.deptAvgRating THEN 'Above Department Average'
+           WHEN rs.avgRating = dar.deptAvgRating THEN 'At Department Average'
+           WHEN rs.avgRating < dar.deptAvgRating THEN 'Below Department Average'
+           ELSE 'No Reviews'
+       END as PerformanceLevel
+FROM ReviewStats rs
+JOIN DEPARTMENT d ON rs.deptId = d.deptId
+LEFT JOIN DeptAvgRating dar ON rs.deptId = dar.deptId
+ORDER BY CASE WHEN rs.avgRating IS NULL THEN 1 ELSE 0 END, rs.avgRating DESC;
+
+
+-- 9. Attendance Pattern Analysis
+WITH AttendanceStats AS (
+    SELECT empId,
+           COUNT(*) as daysPresent,
+           AVG(DATEDIFF(hour, timeIn, timeOut)) as avgHoursWorked,
+           MIN(timeIn) as earliestArrival,
+           MAX(timeOut) as latestDeparture
+    FROM ATTENDANCE
+    WHERE workDate >= DATEADD(month, -1, GETDATE())
+    GROUP BY empId
+),
+EmployeeAttendance AS (
+    SELECT e.empId, e.name, d.deptName,
+           COALESCE(a.daysPresent, 0) as daysPresent,
+           COALESCE(a.avgHoursWorked, 0) as avgHoursWorked,
+           a.earliestArrival,
+           a.latestDeparture
+    FROM EMPLOYEE e
+    JOIN DEPARTMENT d ON e.deptId = d.deptId
+    LEFT JOIN AttendanceStats a ON e.empId = a.empId
+)
+SELECT name, deptName, daysPresent, avgHoursWorked,
+       FORMAT(earliestArrival, 'HH:mm') as earliestArrival,
+       FORMAT(latestDeparture, 'HH:mm') as latestDeparture,
+       CASE 
+           WHEN avgHoursWorked >= 9 THEN 'Overtime Worker'
+           WHEN avgHoursWorked BETWEEN 7.5 AND 9 THEN 'Regular Hours'
+           WHEN avgHoursWorked > 0 THEN 'Part Time'
+           ELSE 'No Recent Attendance'
+       END as WorkPattern
+FROM EmployeeAttendance
+ORDER BY avgHoursWorked DESC;
+
+
+-- 10. Comprehensive Employee Dashboard
+WITH EmployeeSummary AS (
+    SELECT e.empId, e.name, e.jobTitle, d.deptName,
+           s.amount as salary,
+           DATEDIFF(year, e.hireDate, GETDATE()) as yearsOfService
+    FROM EMPLOYEE e
+    JOIN DEPARTMENT d ON e.deptId = d.deptId
+    LEFT JOIN SALARY s ON e.empId = s.empId
+),
+ProjectSummary AS (
+    SELECT pa.empId,
+           COUNT(DISTINCT pa.projectId) as activeProjects,
+           SUM(pa.hoursAllocated) as totalHours
+    FROM PROJECT_ASSIGNMENT pa
+    JOIN PROJECT p ON pa.projectId = p.projectId
+    WHERE p.status = 'In Progress'
+    GROUP BY pa.empId
+),
+ReviewSummary AS (
+    SELECT empId,
+           AVG(rating) as avgRating,
+           MAX(reviewDate) as lastReviewDate
+    FROM PERFORMANCE_REVIEW
+    GROUP BY empId
+)
+SELECT es.name,
+       es.jobTitle,
+       es.deptName,
+       es.salary,
+       es.yearsOfService,
+       COALESCE(ps.activeProjects, 0) as activeProjects,
+       COALESCE(ps.totalHours, 0) as projectHours,
+       rs.avgRating,
+       rs.lastReviewDate,
+       CASE 
+           WHEN rs.lastReviewDate < DATEADD(year, -1, GETDATE()) OR rs.lastReviewDate IS NULL 
+           THEN 'Review Overdue'
+           ELSE 'Review Current'
+       END as reviewStatus
+FROM EmployeeSummary es
+LEFT JOIN ProjectSummary ps ON es.empId = ps.empId
+LEFT JOIN ReviewSummary rs ON es.empId = rs.empId
+ORDER BY es.name;
