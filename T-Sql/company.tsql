@@ -1,0 +1,193 @@
+-- Create tables
+CREATE TABLE DEPARTMENT (
+  deptId int PRIMARY KEY,
+  deptName varchar(20),
+  location varchar(30),
+  managerId int
+);
+
+-- Modify EMPLOYEE table to add more fields and constraints
+CREATE TABLE EMPLOYEE (
+  empId int PRIMARY KEY,
+  name varchar(50),
+  dept varchar(20),
+  email varchar(50),
+  phone varchar(15),
+  hireDate date,
+  jobTitle varchar(30),
+  deptId int,
+  managerId int,
+  FOREIGN KEY (deptId) REFERENCES DEPARTMENT(deptId)
+);
+
+-- Add SALARY table to track compensation
+CREATE TABLE SALARY (
+  salaryId int PRIMARY KEY,
+  empId int,
+  amount decimal(10,2),
+  effectiveDate date,
+  FOREIGN KEY (empId) REFERENCES EMPLOYEE(empId)
+);
+
+-- Add PROJECT table
+CREATE TABLE PROJECT (
+  projectId int PRIMARY KEY,
+  projectName varchar(50),
+  startDate date,
+  endDate date,
+  budget decimal(15,2),
+  deptId int,
+  status varchar(15),
+  FOREIGN KEY (deptId) REFERENCES DEPARTMENT(deptId)
+);
+
+-- Create junction table for employees working on projects
+CREATE TABLE PROJECT_ASSIGNMENT (
+  assignmentId int PRIMARY KEY,
+  empId int,
+  projectId int,
+  roleOnProject varchar(30),
+  hoursAllocated decimal(5,2),
+  FOREIGN KEY (empId) REFERENCES EMPLOYEE(empId),
+  FOREIGN KEY (projectId) REFERENCES PROJECT(projectId)
+);
+
+-- Add ATTENDANCE table
+CREATE TABLE ATTENDANCE (
+  attendanceId int PRIMARY KEY,
+  empId int,
+  workDate date,
+  timeIn datetime,
+  timeOut datetime,
+  FOREIGN KEY (empId) REFERENCES EMPLOYEE(empId)
+);
+
+-- Add PERFORMANCE_REVIEW table
+CREATE TABLE PERFORMANCE_REVIEW (
+  reviewId int PRIMARY KEY,
+  empId int,
+  reviewDate date,
+  rating decimal(3,2),
+  reviewerEmpId int,
+  comments varchar(500),
+  FOREIGN KEY (empId) REFERENCES EMPLOYEE(empId),
+  FOREIGN KEY (reviewerEmpId) REFERENCES EMPLOYEE(empId)
+);
+
+-- Insert data for DEPARTMENT
+INSERT INTO DEPARTMENT(deptId, deptName, location, managerId) VALUES (101, 'Sales', 'Building A, Floor 3', 1);
+INSERT INTO DEPARTMENT(deptId, deptName, location, managerId) VALUES (102, 'Accounting', 'Building B, Floor 2', 2);
+INSERT INTO DEPARTMENT(deptId, deptName, location, managerId) VALUES (103, 'Marketing', 'Building A, Floor 4', 4);
+INSERT INTO DEPARTMENT(deptId, deptName, location, managerId) VALUES (104, 'IT', 'Building C, Floor 1', NULL);
+INSERT INTO DEPARTMENT(deptId, deptName, location, managerId) VALUES (105, 'HR', 'Building B, Floor 1', NULL);
+
+-- Insert more employees
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (1, 'Clark Kent', 'Sales', 'clark.kent@company.com', '555-1234', '2019-03-15', 'Sales Manager', 101, NULL);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (2, 'Dave Johnson', 'Accounting', 'dave.johnson@company.com', '555-2345', '2018-05-22', 'Accounting Manager', 102, NULL);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (3, 'Ava Wilson', 'Sales', 'ava.wilson@company.com', '555-3456', '2020-01-10', 'Sales Representative', 101, 1);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (4, 'Tom Smith', 'Marketing', 'tom.smith@company.com', '555-4567', '2019-11-05', 'Marketing Manager', 103, NULL);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (5, 'Sarah Lee', 'IT', 'sarah.lee@company.com', '555-5678', '2021-02-15', 'Software Developer', 104, NULL);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (6, 'Mike Brown', 'Sales', 'mike.brown@company.com', '555-6789', '2020-08-01', 'Sales Representative', 101, 1);
+
+INSERT INTO EMPLOYEE(empId, name, dept, email, phone, hireDate, jobTitle, deptId, managerId) 
+VALUES (7, 'Emily Davis', 'HR', 'emily.davis@company.com', '555-7890', '2019-06-12', 'HR Manager', 105, NULL);
+
+-- Insert salary records
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1001, 1, 85000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1002, 2, 82000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1003, 3, 65000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1004, 4, 78000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1005, 5, 92000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1006, 6, 67000.00, '2023-01-01');
+INSERT INTO SALARY(salaryId, empId, amount, effectiveDate) VALUES (1007, 7, 75000.00, '2023-01-01');
+
+-- Insert projects
+INSERT INTO PROJECT(projectId, projectName, startDate, endDate, budget, deptId, status) 
+VALUES (201, 'Q2 Sales Campaign', '2023-04-01', '2023-06-30', 50000.00, 101, 'Completed');
+
+INSERT INTO PROJECT(projectId, projectName, startDate, endDate, budget, deptId, status) 
+VALUES (202, 'Financial Year End', '2023-12-01', '2024-01-31', 25000.00, 102, 'In Progress');
+
+INSERT INTO PROJECT(projectId, projectName, startDate, endDate, budget, deptId, status) 
+VALUES (203, 'Website Redesign', '2023-07-15', '2023-10-15', 75000.00, 103, 'Completed');
+
+INSERT INTO PROJECT(projectId, projectName, startDate, endDate, budget, deptId, status) 
+VALUES (204, 'CRM Implementation', '2023-09-01', '2024-03-31', 120000.00, 104, 'In Progress');
+
+INSERT INTO PROJECT(projectId, projectName, startDate, endDate, budget, deptId, status) 
+VALUES (205, 'Employee Engagement', '2024-01-01', '2024-12-31', 30000.00, 105, 'In Progress');
+
+-- Assign employees to projects
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (301, 1, 201, 'Project Lead', 20.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (302, 3, 201, 'Team Member', 40.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (303, 6, 201, 'Team Member', 40.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (304, 2, 202, 'Project Lead', 30.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (305, 4, 203, 'Project Lead', 25.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (306, 5, 204, 'Technical Lead', 35.00);
+
+INSERT INTO PROJECT_ASSIGNMENT(assignmentId, empId, projectId, roleOnProject, hoursAllocated) 
+VALUES (307, 7, 205, 'Project Lead', 15.00);
+
+-- Add some attendance records
+INSERT INTO ATTENDANCE(attendanceId, empId, workDate, timeIn, timeOut) 
+VALUES (401, 1, '2024-05-09', '2024-05-09 08:55:00', '2024-05-09 17:05:00');
+
+INSERT INTO ATTENDANCE(attendanceId, empId, workDate, timeIn, timeOut) 
+VALUES (402, 2, '2024-05-09', '2024-05-09 09:02:00', '2024-05-09 17:30:00');
+
+INSERT INTO ATTENDANCE(attendanceId, empId, workDate, timeIn, timeOut) 
+VALUES (403, 3, '2024-05-09', '2024-05-09 08:45:00', '2024-05-09 16:50:00');
+
+-- Add performance reviews
+INSERT INTO PERFORMANCE_REVIEW(reviewId, empId, reviewDate, rating, reviewerEmpId, comments) 
+VALUES (501, 3, '2023-12-15', 4.5, 1, 'Excellent performance in sales targets. Great team player.');
+
+INSERT INTO PERFORMANCE_REVIEW(reviewId, empId, reviewDate, rating, reviewerEmpId, comments) 
+VALUES (502, 6, '2023-12-16', 4.2, 1, 'Consistently meets targets. Could improve on documentation.');
+
+
+-- Sample queries
+-- Find all employees in Sales department
+SELECT * FROM EMPLOYEE WHERE dept = 'Sales';
+
+-- Find average salary by department
+SELECT d.deptName, AVG(s.amount) as avgSalary
+FROM EMPLOYEE e
+JOIN DEPARTMENT d ON e.deptId = d.deptId
+JOIN SALARY s ON e.empId = s.empId
+GROUP BY d.deptName;
+
+-- Find all projects with assigned employees
+SELECT p.projectName, COUNT(pa.empId) as numEmployees
+FROM PROJECT p
+JOIN PROJECT_ASSIGNMENT pa ON p.projectId = pa.projectId
+GROUP BY p.projectName;
+
+-- Get employee attendance summary for current month
+SELECT e.name, COUNT(a.attendanceId) as daysPresent
+FROM EMPLOYEE e
+LEFT JOIN ATTENDANCE a ON e.empId = a.empId
+WHERE MONTH(a.workDate) = MONTH(GETDATE()) AND YEAR(a.workDate) = YEAR(GETDATE())
+GROUP BY e.name;
