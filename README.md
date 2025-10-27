@@ -12,9 +12,12 @@ This repository contains various SQL scripts, T-SQL scripts, and documentation f
 
 - `.Net/quick_setup.tsql`: SQL scripts for creating and managing a database named `MySchool`.
 - `ADONET/SqlInjectionPrevention.cs`: C# class for preventing SQL injection using parameterized queries.
+- `CompositeKeys.md`: Comprehensive guide to composite keys in SQL with best practices and examples.
 - `README.md`: Provides links to various resources related to SQL, ORM, and SQL linters/parsers.
+- `T-Sql/company.tsql`: Comprehensive company database with complex queries and CTEs.
 - `T-Sql/gg.tsql`: Script for dropping all user databases in SQL Server.
 - `T-Sql/gg2.tsql`: Script for dropping all user databases in SQL Server.
+- `T-Sql/id-ego-superego-composite-key.tsql`: Demonstrates composite key concepts using Freudian psychology model.
 - `T-Sql/OPENROWSET_example.tsql`: Examples of using the `OPENROWSET` function in SQL Server.
 
 ## Setting Up and Using SQL Scripts
@@ -88,6 +91,46 @@ public class SqlInjectionPrevention
     }
 }
 ```
+
+## Composite Keys in SQL
+
+Composite keys (also known as compound keys) are primary keys composed of two or more columns that together uniquely identify each row in a table. This repository includes a comprehensive example demonstrating composite key concepts.
+
+### Id-Ego-Superego Composite Key Example
+
+The `T-Sql/id-ego-superego-composite-key.tsql` file provides a creative demonstration of composite keys using Freudian psychology concepts. In this example:
+
+- **id**: Represents the instinctive, primitive desires (integer value)
+- **ego**: Represents the realistic, mediating part (integer value)
+- **superego**: Represents the moral, idealistic part (integer value)
+
+Together, these three columns form a composite primary key that uniquely identifies different psychological states. The example includes:
+
+1. **Main Table**: `PsychologicalState` with composite key (id, ego, superego)
+2. **Related Tables**: `PsychologicalConflict`, `BehavioralOutcome`, `PsycheMetrics`
+3. **Complex Queries**: Demonstrating joins, CTEs, and analysis using composite keys
+4. **Referential Integrity**: Shows how foreign keys reference composite keys
+
+```sql
+CREATE TABLE PsychologicalState (
+    id INT NOT NULL,
+    ego INT NOT NULL,
+    superego INT NOT NULL,
+    stateName VARCHAR(100),
+    description VARCHAR(500),
+    conflictLevel DECIMAL(3,2),
+    CONSTRAINT PK_PsychologicalState PRIMARY KEY (id, ego, superego)
+);
+```
+
+### Key Benefits Demonstrated
+
+- **Natural Representation**: Models complex multi-dimensional concepts
+- **Data Integrity**: Ensures uniqueness across multiple attributes
+- **Referential Integrity**: Maintains consistency across related tables
+- **Real-World Modeling**: Reflects actual relationships in the domain
+
+For a complete guide on composite keys, including when to use them, best practices, advantages, and disadvantages, see the [CompositeKeys.md](CompositeKeys.md) documentation.
 
 ## Using TSqlParser for Parsing and Analyzing SQL Scripts
 
