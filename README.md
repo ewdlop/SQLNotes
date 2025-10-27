@@ -11,7 +11,7 @@
 This repository contains various SQL scripts, T-SQL scripts, and documentation files. Below is a summary of each file and its purpose:
 
 - `.Net/quick_setup.tsql`: SQL scripts for creating and managing a database named `MySchool`.
-- `ADONET/SqlInjectionPrevention.cs`: C# class for preventing SQL injection using parameterized queries.
+- `ADONET/SqlInjectionPrevention.cs`: C# class for preventing SQL injection using parameterized queries. <- Type safety?
 - `README.md`: Provides links to various resources related to SQL, ORM, and SQL linters/parsers.
 - `T-Sql/gg.tsql`: Script for dropping all user databases in SQL Server.
 - `T-Sql/gg2.tsql`: Script for dropping all user databases in SQL Server.
