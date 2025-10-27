@@ -1,0 +1,355 @@
+-- ========================================
+-- ID-EGO-SUPEREGO COMPOSITE KEY DEMONSTRATION
+-- ========================================
+-- This file demonstrates the use of composite keys using Freudian psychology concepts.
+-- The id, ego, and superego together form a unique composite key representing 
+-- the three parts of the human psyche according to Freudian theory.
+--
+-- Composite keys are useful when:
+-- 1. No single column can uniquely identify a row
+-- 2. Multiple columns together form a natural unique identifier
+-- 3. Representing complex relationships between entities
+
+-- ========================================
+-- CREATE TABLES
+-- ========================================
+
+-- Main table demonstrating id-ego-superego as composite key
+-- This represents psychological states or decision moments
+CREATE TABLE PsychologicalState (
+    id INT NOT NULL,           -- Represents the instinctive, primitive desires
+    ego INT NOT NULL,          -- Represents the realistic, mediating part
+    superego INT NOT NULL,     -- Represents the moral, idealistic part
+    stateName VARCHAR(100),
+    description VARCHAR(500),
+    conflictLevel DECIMAL(3,2), -- 0.00 to 5.00 scale
+    resolutionStrategy VARCHAR(200),
+    recordedAt DATETIME DEFAULT GETDATE(),
+    -- Composite primary key using all three components
+    CONSTRAINT PK_PsychologicalState PRIMARY KEY (id, ego, superego)
+);
+
+-- Table to track psychological conflicts and their resolutions
+CREATE TABLE PsychologicalConflict (
+    conflictId INT PRIMARY KEY IDENTITY(1,1),
+    id INT NOT NULL,
+    ego INT NOT NULL,
+    superego INT NOT NULL,
+    conflictType VARCHAR(50),
+    severity VARCHAR(20),
+    resolution VARCHAR(500),
+    resolvedDate DATETIME,
+    -- Foreign key referencing the composite key
+    CONSTRAINT FK_Conflict_State FOREIGN KEY (id, ego, superego)
+        REFERENCES PsychologicalState(id, ego, superego)
+);
+
+-- Table representing behavioral outcomes based on psyche balance
+CREATE TABLE BehavioralOutcome (
+    outcomeId INT PRIMARY KEY IDENTITY(1,1),
+    id INT NOT NULL,
+    ego INT NOT NULL,
+    superego INT NOT NULL,
+    behavior VARCHAR(200),
+    impact VARCHAR(100),
+    timestamp DATETIME DEFAULT GETDATE(),
+    -- Foreign key referencing the composite key
+    CONSTRAINT FK_Outcome_State FOREIGN KEY (id, ego, superego)
+        REFERENCES PsychologicalState(id, ego, superego)
+);
+
+-- Table for tracking psyche component strengths over time
+CREATE TABLE PsycheMetrics (
+    metricId INT PRIMARY KEY IDENTITY(1,1),
+    id INT NOT NULL,
+    ego INT NOT NULL,
+    superego INT NOT NULL,
+    idStrength DECIMAL(5,2),      -- How strong the id impulses are
+    egoBalance DECIMAL(5,2),       -- How well the ego mediates
+    superegoRigidity DECIMAL(5,2), -- How strict the moral standards
+    harmonyScore DECIMAL(5,2),     -- Overall balance (0-100)
+    assessmentDate DATETIME DEFAULT GETDATE(),
+    -- Foreign key referencing the composite key
+    CONSTRAINT FK_Metrics_State FOREIGN KEY (id, ego, superego)
+        REFERENCES PsychologicalState(id, ego, superego)
+);
+
+-- ========================================
+-- INSERT SAMPLE DATA
+-- ========================================
+
+-- Insert various psychological states with different id-ego-superego combinations
+INSERT INTO PsychologicalState (id, ego, superego, stateName, description, conflictLevel, resolutionStrategy)
+VALUES 
+(1, 1, 1, 'Balanced Harmony', 'All three components are in perfect balance, leading to healthy decision-making', 1.00, 'Maintain current balance through mindfulness'),
+(1, 2, 1, 'Ego-Dominant Pragmatism', 'Ego is stronger, focusing on practical solutions', 2.00, 'Allow more emotional expression'),
+(2, 1, 1, 'Id-Driven Impulse', 'Strong desires seeking immediate gratification', 3.50, 'Strengthen rational thinking and moral consideration'),
+(1, 1, 2, 'Superego-Controlled Restraint', 'Moral standards dominate, possibly leading to over-restriction', 3.00, 'Allow more flexibility and self-compassion'),
+(2, 2, 2, 'High-Intensity Conflict', 'All components are strong, creating intense internal struggle', 4.50, 'Seek professional guidance for integration'),
+(1, 2, 2, 'Ethical Pragmatism', 'Balance between morality and practicality', 1.50, 'Continue current approach'),
+(2, 1, 2, 'Desire vs. Morality', 'Strong conflict between wants and moral standards', 4.00, 'Ego mediation needed to find compromise'),
+(3, 2, 1, 'Extreme Id Pressure', 'Very strong primitive desires challenging control', 4.80, 'Crisis intervention required'),
+(1, 3, 1, 'Hyper-Rational Control', 'Ego is extremely dominant, suppressing other aspects', 3.20, 'Reconnect with emotions and values'),
+(1, 1, 3, 'Rigid Moral Standards', 'Extremely strict superego causing guilt and anxiety', 4.20, 'Work on self-acceptance and flexibility');
+
+-- Insert psychological conflicts
+INSERT INTO PsychologicalConflict (id, ego, superego, conflictType, severity, resolution, resolvedDate)
+VALUES
+(1, 1, 1, 'Decision-Making', 'Low', 'Balanced approach led to satisfactory outcome', '2024-01-15'),
+(2, 1, 1, 'Impulse Control', 'High', 'Required significant ego intervention to manage desires', '2024-01-20'),
+(1, 1, 2, 'Moral Dilemma', 'Medium', 'Found middle ground between strictness and practicality', '2024-02-01'),
+(2, 2, 2, 'Identity Crisis', 'Critical', 'Ongoing therapeutic intervention', NULL),
+(2, 1, 2, 'Values Conflict', 'High', 'Gradual integration through conscious awareness', '2024-02-15'),
+(3, 2, 1, 'Addiction Pattern', 'Critical', 'Intensive treatment program initiated', NULL),
+(1, 3, 1, 'Emotional Suppression', 'Medium', 'Learning to accept emotional experiences', '2024-03-01'),
+(1, 1, 3, 'Perfectionism', 'High', 'Working on realistic standards and self-compassion', NULL);
+
+-- Insert behavioral outcomes
+INSERT INTO BehavioralOutcome (id, ego, superego, behavior, impact, timestamp)
+VALUES
+(1, 1, 1, 'Thoughtful communication with others', 'Positive relationship building', '2024-01-10 10:00:00'),
+(2, 1, 1, 'Impulsive purchase decision', 'Short-term regret, learning opportunity', '2024-01-12 15:30:00'),
+(1, 1, 2, 'Declining social invitation due to perceived obligations', 'Increased isolation', '2024-01-18 19:00:00'),
+(2, 2, 2, 'Procrastination on important task', 'Internal conflict and stress', '2024-01-25 14:00:00'),
+(1, 2, 1, 'Efficient problem-solving at work', 'Professional success', '2024-02-05 11:00:00'),
+(2, 1, 2, 'Resisting temptation through willpower', 'Sense of accomplishment but fatigue', '2024-02-10 16:00:00'),
+(3, 2, 1, 'Engaging in risky behavior', 'Immediate pleasure, long-term consequences', '2024-02-14 22:00:00'),
+(1, 3, 1, 'Over-analyzing simple decision', 'Paralysis by analysis', '2024-02-20 09:00:00'),
+(1, 1, 3, 'Excessive self-criticism', 'Decreased self-esteem', '2024-03-01 12:00:00'),
+(1, 2, 2, 'Balanced life choice', 'Sustainable wellbeing', '2024-03-05 10:00:00');
+
+-- Insert psyche metrics
+INSERT INTO PsycheMetrics (id, ego, superego, idStrength, egoBalance, superegoRigidity, harmonyScore)
+VALUES
+(1, 1, 1, 50.00, 90.00, 50.00, 85.00),
+(1, 2, 1, 45.00, 95.00, 48.00, 88.00),
+(2, 1, 1, 85.00, 60.00, 45.00, 55.00),
+(1, 1, 2, 40.00, 75.00, 88.00, 60.00),
+(2, 2, 2, 80.00, 85.00, 82.00, 50.00),
+(1, 2, 2, 48.00, 92.00, 75.00, 78.00),
+(2, 1, 2, 88.00, 55.00, 90.00, 45.00),
+(3, 2, 1, 95.00, 70.00, 40.00, 35.00),
+(1, 3, 1, 35.00, 98.00, 42.00, 70.00),
+(1, 1, 3, 38.00, 72.00, 95.00, 52.00);
+
+-- ========================================
+-- QUERY EXAMPLES
+-- ========================================
+
+-- 1. Retrieve all psychological states ordered by conflict level
+SELECT id, ego, superego, stateName, conflictLevel, resolutionStrategy
+FROM PsychologicalState
+ORDER BY conflictLevel DESC;
+
+-- 2. Find states with high conflict (above 4.0)
+SELECT id, ego, superego, stateName, description, conflictLevel
+FROM PsychologicalState
+WHERE conflictLevel >= 4.0;
+
+-- 3. Get all conflicts for a specific psychological state
+SELECT ps.stateName, pc.conflictType, pc.severity, pc.resolution, pc.resolvedDate
+FROM PsychologicalState ps
+JOIN PsychologicalConflict pc ON ps.id = pc.id 
+    AND ps.ego = pc.ego 
+    AND ps.superego = pc.superego
+WHERE ps.id = 2 AND ps.ego = 2 AND ps.superego = 2;
+
+-- 4. Find behavioral outcomes grouped by psychological state
+SELECT ps.stateName, COUNT(bo.outcomeId) as outcomeCount, 
+       STRING_AGG(bo.behavior, '; ') as behaviors
+FROM PsychologicalState ps
+LEFT JOIN BehavioralOutcome bo ON ps.id = bo.id 
+    AND ps.ego = bo.ego 
+    AND ps.superego = bo.superego
+GROUP BY ps.id, ps.ego, ps.superego, ps.stateName
+ORDER BY outcomeCount DESC;
+
+-- 5. Analyze psyche metrics with harmony scores
+SELECT ps.stateName, pm.idStrength, pm.egoBalance, pm.superegoRigidity, pm.harmonyScore,
+       CASE 
+           WHEN pm.harmonyScore >= 80 THEN 'Excellent Balance'
+           WHEN pm.harmonyScore >= 60 THEN 'Good Balance'
+           WHEN pm.harmonyScore >= 40 THEN 'Moderate Imbalance'
+           ELSE 'Significant Imbalance'
+       END as BalanceAssessment
+FROM PsychologicalState ps
+JOIN PsycheMetrics pm ON ps.id = pm.id 
+    AND ps.ego = pm.ego 
+    AND ps.superego = pm.superego
+ORDER BY pm.harmonyScore DESC;
+
+-- 6. Identify unresolved conflicts requiring attention
+SELECT ps.stateName, pc.conflictType, pc.severity, ps.conflictLevel,
+       DATEDIFF(day, pc.resolvedDate, GETDATE()) as daysUnresolved
+FROM PsychologicalState ps
+JOIN PsychologicalConflict pc ON ps.id = pc.id 
+    AND ps.ego = pc.ego 
+    AND ps.superego = pc.superego
+WHERE pc.resolvedDate IS NULL
+ORDER BY ps.conflictLevel DESC, pc.severity DESC;
+
+-- ========================================
+-- COMPLEX QUERIES WITH CTEs
+-- ========================================
+
+-- 7. Comprehensive analysis of each psyche component dominance
+WITH ComponentAnalysis AS (
+    SELECT id, ego, superego, stateName, conflictLevel,
+           CASE 
+               WHEN id > ego AND id > superego THEN 'Id-Dominant'
+               WHEN ego > id AND ego > superego THEN 'Ego-Dominant'
+               WHEN superego > id AND superego > ego THEN 'Superego-Dominant'
+               ELSE 'Balanced'
+           END as DominantComponent,
+           (id + ego + superego) as TotalPsycheScore
+    FROM PsychologicalState
+)
+SELECT DominantComponent, 
+       COUNT(*) as StateCount,
+       AVG(conflictLevel) as AvgConflictLevel,
+       AVG(TotalPsycheScore) as AvgTotalScore
+FROM ComponentAnalysis
+GROUP BY DominantComponent
+ORDER BY AvgConflictLevel DESC;
+
+-- 8. Track conflict resolution success rate by state type
+WITH ConflictSummary AS (
+    SELECT ps.id, ps.ego, ps.superego, ps.stateName,
+           COUNT(pc.conflictId) as TotalConflicts,
+           SUM(CASE WHEN pc.resolvedDate IS NOT NULL THEN 1 ELSE 0 END) as ResolvedConflicts
+    FROM PsychologicalState ps
+    LEFT JOIN PsychologicalConflict pc ON ps.id = pc.id 
+        AND ps.ego = pc.ego 
+        AND ps.superego = pc.superego
+    GROUP BY ps.id, ps.ego, ps.superego, ps.stateName
+)
+SELECT stateName, TotalConflicts, ResolvedConflicts,
+       CASE 
+           WHEN TotalConflicts > 0 THEN 
+               CAST(ResolvedConflicts * 100.0 / TotalConflicts AS DECIMAL(5,2))
+           ELSE 0
+       END as ResolutionRate
+FROM ConflictSummary
+WHERE TotalConflicts > 0
+ORDER BY ResolutionRate ASC;
+
+-- 9. Behavioral pattern analysis over time
+WITH BehaviorTimeline AS (
+    SELECT bo.id, bo.ego, bo.superego, bo.behavior, bo.impact, bo.timestamp,
+           ROW_NUMBER() OVER (PARTITION BY bo.id, bo.ego, bo.superego ORDER BY bo.timestamp) as BehaviorSequence
+    FROM BehavioralOutcome bo
+)
+SELECT ps.stateName, bt.behavior, bt.impact, bt.timestamp, bt.BehaviorSequence
+FROM BehaviorTimeline bt
+JOIN PsychologicalState ps ON bt.id = ps.id 
+    AND bt.ego = ps.ego 
+    AND bt.superego = ps.superego
+ORDER BY bt.id, bt.ego, bt.superego, bt.BehaviorSequence;
+
+-- 10. Identify critical states requiring immediate attention
+WITH CriticalAssessment AS (
+    SELECT ps.id, ps.ego, ps.superego, ps.stateName, ps.conflictLevel,
+           pm.harmonyScore,
+           COUNT(DISTINCT pc.conflictId) as UnresolvedConflicts
+    FROM PsychologicalState ps
+    JOIN PsycheMetrics pm ON ps.id = pm.id 
+        AND ps.ego = pm.ego 
+        AND ps.superego = pm.superego
+    LEFT JOIN PsychologicalConflict pc ON ps.id = pc.id 
+        AND ps.ego = pc.ego 
+        AND ps.superego = pc.superego
+        AND pc.resolvedDate IS NULL
+    GROUP BY ps.id, ps.ego, ps.superego, ps.stateName, ps.conflictLevel, pm.harmonyScore
+)
+SELECT stateName, conflictLevel, harmonyScore, UnresolvedConflicts,
+       CASE 
+           WHEN conflictLevel >= 4.5 OR harmonyScore < 40 OR UnresolvedConflicts >= 2 THEN 'CRITICAL - Immediate Intervention'
+           WHEN conflictLevel >= 3.5 OR harmonyScore < 60 OR UnresolvedConflicts = 1 THEN 'HIGH PRIORITY - Schedule Assessment'
+           WHEN conflictLevel >= 2.5 OR harmonyScore < 75 THEN 'MODERATE - Monitor Closely'
+           ELSE 'STABLE - Routine Check-ins'
+       END as InterventionLevel
+FROM CriticalAssessment
+ORDER BY 
+    CASE 
+        WHEN conflictLevel >= 4.5 THEN 1
+        WHEN harmonyScore < 40 THEN 2
+        WHEN UnresolvedConflicts >= 2 THEN 3
+        ELSE 4
+    END,
+    conflictLevel DESC;
+
+-- 11. Psyche component correlation analysis
+WITH ComponentMetrics AS (
+    SELECT pm.id, pm.ego, pm.superego,
+           pm.idStrength, pm.egoBalance, pm.superegoRigidity,
+           ps.conflictLevel
+    FROM PsycheMetrics pm
+    JOIN PsychologicalState ps ON pm.id = ps.id 
+        AND pm.ego = ps.ego 
+        AND pm.superego = ps.superego
+)
+SELECT 
+    AVG(idStrength) as AvgIdStrength,
+    AVG(egoBalance) as AvgEgoBalance,
+    AVG(superegoRigidity) as AvgSuperegoRigidity,
+    AVG(conflictLevel) as AvgConflictLevel,
+    STDEV(idStrength) as IdVariability,
+    STDEV(egoBalance) as EgoVariability,
+    STDEV(superegoRigidity) as SuperegoVariability
+FROM ComponentMetrics;
+
+-- ========================================
+-- DEMONSTRATION OF COMPOSITE KEY BENEFITS
+-- ========================================
+
+-- Example 1: Cannot insert duplicate composite keys
+-- This would fail: 
+-- INSERT INTO PsychologicalState (id, ego, superego, stateName, conflictLevel)
+-- VALUES (1, 1, 1, 'Duplicate State', 2.0);
+-- Error: Violation of PRIMARY KEY constraint
+
+-- Example 2: Can have same individual values, but different combinations
+INSERT INTO PsychologicalState (id, ego, superego, stateName, description, conflictLevel, resolutionStrategy)
+VALUES (1, 2, 3, 'Unique Combination', 'All individual values exist separately but this combination is new', 2.50, 'Standard approach');
+
+-- Example 3: Referential integrity with composite foreign keys
+-- This ensures all related records maintain consistency
+-- Try to insert a conflict for non-existent state (would fail):
+-- INSERT INTO PsychologicalConflict (id, ego, superego, conflictType)
+-- VALUES (99, 99, 99, 'Invalid Reference');
+-- Error: Foreign key constraint violation
+
+-- ========================================
+-- COMPOSITE KEY ADVANTAGES DEMONSTRATION
+-- ========================================
+
+-- Query showing how composite keys maintain data integrity
+SELECT 
+    'Total Psychological States' as Category,
+    COUNT(*) as Count
+FROM PsychologicalState
+UNION ALL
+SELECT 
+    'States with Conflicts',
+    COUNT(DISTINCT CONCAT(id, '-', ego, '-', superego))
+FROM PsychologicalConflict
+UNION ALL
+SELECT 
+    'States with Behavioral Outcomes',
+    COUNT(DISTINCT CONCAT(id, '-', ego, '-', superego))
+FROM BehavioralOutcome
+UNION ALL
+SELECT 
+    'States with Metrics',
+    COUNT(DISTINCT CONCAT(id, '-', ego, '-', superego))
+FROM PsycheMetrics;
+
+-- ========================================
+-- CLEANUP (Optional - uncomment to drop tables)
+-- ========================================
+/*
+DROP TABLE IF EXISTS PsycheMetrics;
+DROP TABLE IF EXISTS BehavioralOutcome;
+DROP TABLE IF EXISTS PsychologicalConflict;
+DROP TABLE IF EXISTS PsychologicalState;
+*/
