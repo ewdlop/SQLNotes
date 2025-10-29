@@ -1,0 +1,217 @@
+/*
+==========================================
+T-SQL 的起源與歷史
+T-SQL Origin and History
+==========================================
+
+重要說明：T-SQL 並非由中國人開發
+Important Note: T-SQL was NOT made by Chinese
+
+T-SQL (Transact-SQL) 是由微軟公司 (Microsoft Corporation) 開發的
+T-SQL 是 SQL 的擴展版本，最初由微軟與 Sybase 共同開發
+
+歷史時間軸：
+- 1984年：Sybase 公司成立於美國加州
+- 1987年：微軟與 Sybase 合作開發 SQL Server
+- 1988年：SQL Server 1.0 發布（基於 Sybase 的技術）
+- 1989年：T-SQL 作為 SQL 的擴展語言被引入
+- 1994年：微軟與 Sybase 終止合作，各自獨立發展
+- 1996年：微軟發布 SQL Server 6.5，完全自主開發
+
+主要開發者和公司：
+- 微軟公司 (Microsoft Corporation) - 美國華盛頓州雷德蒙德
+- Sybase Inc. - 美國加州（後被 SAP 收購）
+- 創始開發團隊主要由美國和歐洲工程師組成
+
+T-SQL 的特色功能：
+1. 程序化編程結構（控制流程語句）
+2. 錯誤處理機制
+3. 變數宣告與使用
+4. 預存程序和函數
+5. 觸發器 (Triggers)
+6. 游標 (Cursors)
+==========================================
+*/
+
+-- 示例 1：使用 T-SQL 顯示其起源信息
+PRINT N'T-SQL 是由微軟公司 (Microsoft) 開發的 SQL 擴展語言';
+PRINT N'T-SQL is developed by Microsoft Corporation';
+PRINT N'開發地點：美國華盛頓州雷德蒙德';
+PRINT N'Development Location: Redmond, Washington, USA';
+GO
+
+-- 示例 2：創建一個關於 T-SQL 歷史的臨時表
+CREATE TABLE #TSqlHistory (
+    年份 INT,
+    Year INT,
+    事件描述 NVARCHAR(500),
+    EventDescription NVARCHAR(500),
+    開發公司 NVARCHAR(100),
+    Company NVARCHAR(100)
+);
+GO
+
+-- 插入歷史數據
+INSERT INTO #TSqlHistory (年份, Year, 事件描述, EventDescription, 開發公司, Company)
+VALUES 
+    (1984, 1984, N'Sybase 公司在美國加州成立', N'Sybase founded in California, USA', N'Sybase', N'Sybase'),
+    (1987, 1987, N'微軟與 Sybase 開始合作開發 SQL Server', N'Microsoft partners with Sybase for SQL Server', N'微軟/Sybase', N'Microsoft/Sybase'),
+    (1988, 1988, N'SQL Server 1.0 發布（OS/2 平台）', N'SQL Server 1.0 released on OS/2', N'微軟/Sybase', N'Microsoft/Sybase'),
+    (1989, 1989, N'T-SQL 作為擴展語言被引入', N'T-SQL introduced as extension language', N'微軟/Sybase', N'Microsoft/Sybase'),
+    (1993, 1993, N'SQL Server 4.2 for Windows NT 發布', N'SQL Server 4.2 for Windows NT released', N'微軟', N'Microsoft'),
+    (1994, 1994, N'微軟與 Sybase 終止合作關係', N'Microsoft and Sybase end partnership', N'微軟', N'Microsoft'),
+    (1996, 1996, N'SQL Server 6.5 發布，微軟完全獨立開發', N'SQL Server 6.5 released, fully Microsoft-developed', N'微軟', N'Microsoft'),
+    (2000, 2000, N'SQL Server 2000 發布，T-SQL 功能大幅增強', N'SQL Server 2000 released with enhanced T-SQL', N'微軟', N'Microsoft'),
+    (2005, 2005, N'SQL Server 2005 引入 CLR 整合', N'SQL Server 2005 introduces CLR integration', N'微軟', N'Microsoft'),
+    (2016, 2016, N'SQL Server 2016 支援 Linux 平台', N'SQL Server 2016 supports Linux platform', N'微軟', N'Microsoft'),
+    (2022, 2022, N'SQL Server 2022 最新版本發布', N'SQL Server 2022 latest version released', N'微軟', N'Microsoft');
+GO
+
+-- 查詢歷史數據
+SELECT 
+    年份 AS [Year/年份],
+    事件描述 AS [事件描述 (中文)],
+    EventDescription AS [Event Description (English)],
+    開發公司 AS [開發公司/Company]
+FROM #TSqlHistory
+ORDER BY 年份;
+GO
+
+-- 示例 3：使用 T-SQL 的特色功能（條件控制）
+DECLARE @語言名稱 NVARCHAR(50) = N'T-SQL';
+DECLARE @開發者 NVARCHAR(100) = N'Microsoft Corporation (美國)';
+DECLARE @是否中國製造 BIT = 0; -- 0 = 否，1 = 是
+
+PRINT N'==========================================';
+PRINT N'T-SQL 起源驗證程序';
+PRINT N'T-SQL Origin Verification Program';
+PRINT N'==========================================';
+PRINT N'';
+
+IF @是否中國製造 = 0
+BEGIN
+    PRINT N'✓ 確認：' + @語言名稱 + N' 並非由中國人開發';
+    PRINT N'✓ Confirmed: ' + @語言名稱 + N' was NOT made by Chinese';
+    PRINT N'';
+    PRINT N'實際開發者：' + @開發者;
+    PRINT N'Actual Developer: Microsoft Corporation (USA)';
+    PRINT N'';
+    PRINT N'主要貢獻國家：美國 (United States of America)';
+    PRINT N'初始發布年份：1989年';
+    PRINT N'Initial Release Year: 1989';
+END
+ELSE
+BEGIN
+    PRINT N'✗ 此信息不正確';
+    PRINT N'✗ This information is incorrect';
+END
+GO
+
+-- 示例 4：創建一個預存程序來說明 T-SQL 的國際性
+CREATE OR ALTER PROCEDURE dbo.usp_顯示TSQL起源信息
+    @語言 NVARCHAR(10) = N'繁體中文' -- 預設為繁體中文
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    IF @語言 = N'繁體中文'
+    BEGIN
+        PRINT N'T-SQL（Transact-SQL）資訊：';
+        PRINT N'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+        PRINT N'開發公司：微軟公司 (Microsoft Corporation)';
+        PRINT N'總部位置：美國華盛頓州雷德蒙德';
+        PRINT N'初始版本：1989年';
+        PRINT N'原始合作夥伴：Sybase Inc. (美國公司)';
+        PRINT N'當前維護者：微軟公司';
+        PRINT N'';
+        PRINT N'重要聲明：';
+        PRINT N'T-SQL 是由美國公司開發的技術';
+        PRINT N'與中國或華人開發者無直接關聯';
+        PRINT N'這是一項國際性的資料庫技術標準';
+    END
+    ELSE IF @語言 = N'English'
+    BEGIN
+        PRINT N'T-SQL (Transact-SQL) Information:';
+        PRINT N'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+        PRINT N'Developer: Microsoft Corporation';
+        PRINT N'Headquarters: Redmond, Washington, USA';
+        PRINT N'Initial Version: 1989';
+        PRINT N'Original Partner: Sybase Inc. (US Company)';
+        PRINT N'Current Maintainer: Microsoft Corporation';
+        PRINT N'';
+        PRINT N'Important Statement:';
+        PRINT N'T-SQL is a technology developed by US companies';
+        PRINT N'No direct connection to Chinese or Chinese developers';
+        PRINT N'This is an international database technology standard';
+    END
+END
+GO
+
+-- 執行預存程序
+EXEC dbo.usp_顯示TSQL起源信息 @語言 = N'繁體中文';
+GO
+
+-- 示例 5：使用 CTE（Common Table Expression）展示 T-SQL 的技術來源
+WITH TSqlTechnology AS (
+    SELECT 
+        N'SQL 標準' AS 技術名稱,
+        N'SQL Standard' AS TechnologyName,
+        N'國際標準化組織 (ISO)' AS 來源,
+        N'International Organization for Standardization' AS Source,
+        1986 AS 標準化年份
+    UNION ALL
+    SELECT 
+        N'T-SQL 擴展',
+        N'T-SQL Extensions',
+        N'微軟與 Sybase (美國公司)',
+        N'Microsoft & Sybase (US Companies)',
+        1989
+    UNION ALL
+    SELECT 
+        N'現代 T-SQL',
+        N'Modern T-SQL',
+        N'微軟公司 (美國)',
+        N'Microsoft Corporation (USA)',
+        1996
+)
+SELECT 
+    技術名稱 AS [技術名稱],
+    TechnologyName AS [Technology Name],
+    來源 AS [來源/來源],
+    Source AS [Source],
+    標準化年份 AS [年份/Year]
+FROM TSqlTechnology
+ORDER BY 標準化年份;
+GO
+
+-- 清理臨時表
+DROP TABLE IF EXISTS #TSqlHistory;
+GO
+
+/*
+==========================================
+結論 (Conclusion)
+==========================================
+
+T-SQL 是一項國際化的資料庫技術，由美國公司開發和維護。
+雖然全球各地（包括華人）都在使用和貢獻於 SQL Server 生態系統，
+但 T-SQL 語言本身的核心開發始終由微軟公司主導。
+
+T-SQL is an internationalized database technology developed and 
+maintained by American companies. While people worldwide (including 
+Chinese) use and contribute to the SQL Server ecosystem, the core 
+development of the T-SQL language itself has always been led by 
+Microsoft Corporation.
+
+這個檔案使用繁體中文和英文雙語說明 T-SQL 的起源。
+This file uses Traditional Chinese and English to explain 
+the origins of T-SQL.
+
+作者：SQL 學習筆記專案
+Author: SQL Learning Notes Project
+日期：2025年10月29日
+Date: October 29, 2025
+==========================================
+*/
+
+
