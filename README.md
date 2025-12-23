@@ -13,6 +13,8 @@ This repository contains various SQL scripts, T-SQL scripts, and documentation f
 - `.Net/quick_setup.tsql`: SQL scripts for creating and managing a database named `MySchool`.
 - `ADONET/SqlInjectionPrevention.cs`: C# class for preventing SQL injection using parameterized queries. <- Type safety?
 - `README.md`: Provides links to various resources related to SQL, ORM, and SQL linters/parsers.
+- `T-Sql/company.tsql`: Comprehensive example database schema for company management with employees, departments, projects, and complex queries.
+- `T-Sql/freudian-psychology.tsql`: Educational database schema demonstrating Freudian psychology concepts (Id, Ego, Superego) with primary and foreign key relationships.
 - `T-Sql/gg.tsql`: Script for dropping all user databases in SQL Server.
 - `T-Sql/gg2.tsql`: Script for dropping all user databases in SQL Server.
 - `T-Sql/OPENROWSET_example.tsql`: Examples of using the `OPENROWSET` function in SQL Server.
@@ -45,6 +47,23 @@ This file provides examples of using the `OPENROWSET` function in SQL Server. To
 2. Connect to your SQL Server instance.
 3. Open the `OPENROWSET_example.tsql` file.
 4. Execute the script to see examples of using the `OPENROWSET` function.
+
+### T-Sql/freudian-psychology.tsql
+
+This educational schema demonstrates Freudian psychology concepts (Id, Ego, and Superego) as a practical example of database design with primary and foreign key relationships. The schema includes:
+
+- **ID_COMPONENT**: Represents primitive, instinctual drives (Life Instinct, Death Instinct)
+- **SUPEREGO_COMPONENT**: Represents moral conscience and ideals (Conscience, Ego Ideal)
+- **EGO_DECISION**: Mediates between Id and Superego components with foreign key relationships
+- **PSYCHOLOGICAL_CONFLICT**: Tracks conflicts and their resolutions
+- **DEFENSE_MECHANISM_CATALOG**: Catalogs psychological defense mechanisms
+
+To use this example:
+
+1. Open SQL Server Management Studio (SSMS).
+2. Connect to your SQL Server instance.
+3. Open the `freudian-psychology.tsql` file.
+4. Execute the script to create the psychology database and explore the sample queries demonstrating complex joins and CTEs.
 
 ## SQL Injection Prevention
 
