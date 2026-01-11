@@ -1,0 +1,328 @@
+-- ========================================
+-- FREUDIAN PSYCHOLOGY DATABASE SCHEMA
+-- ========================================
+-- This schema demonstrates the Freudian model of the psyche:
+-- Id (primitive desires), Ego (reality mediator), and Superego (moral conscience)
+-- as a practical example of primary keys and foreign key relationships
+
+-- ========================================
+-- CREATE TABLES
+-- ========================================
+
+-- The ID table represents primitive, instinctual drives
+CREATE TABLE ID_COMPONENT (
+  idComponentId INT PRIMARY KEY,
+  driveName VARCHAR(50) NOT NULL,
+  driveType VARCHAR(20) CHECK (driveType IN ('Life Instinct', 'Death Instinct')),
+  intensity DECIMAL(3,2) CHECK (intensity BETWEEN 0 AND 10),
+  description VARCHAR(500),
+  isConscious BIT DEFAULT 0
+);
+
+-- The SUPEREGO table represents moral conscience and ideals
+CREATE TABLE SUPEREGO_COMPONENT (
+  superegoComponentId INT PRIMARY KEY,
+  moralRule VARCHAR(100) NOT NULL,
+  ruleType VARCHAR(20) CHECK (ruleType IN ('Conscience', 'Ego Ideal')),
+  strictness DECIMAL(3,2) CHECK (strictness BETWEEN 0 AND 10),
+  origin VARCHAR(50), -- e.g., 'Parental', 'Cultural', 'Religious'
+  description VARCHAR(500)
+);
+
+-- The EGO table represents the reality-mediating component
+-- It has foreign keys to both ID and SUPEREGO, mediating between them
+CREATE TABLE EGO_DECISION (
+  egoDecisionId INT PRIMARY KEY,
+  decisionName VARCHAR(100) NOT NULL,
+  idComponentId INT,
+  superegoComponentId INT,
+  realityConstraint VARCHAR(200),
+  defenseMechanism VARCHAR(50), -- e.g., 'Repression', 'Sublimation', 'Rationalization'
+  outcome VARCHAR(200),
+  anxietyLevel DECIMAL(3,2) CHECK (anxietyLevel BETWEEN 0 AND 10),
+  timestamp DATETIME DEFAULT GETDATE(),
+  FOREIGN KEY (idComponentId) REFERENCES ID_COMPONENT(idComponentId),
+  FOREIGN KEY (superegoComponentId) REFERENCES SUPEREGO_COMPONENT(superegoComponentId)
+);
+
+-- CONFLICT table tracks psychological conflicts
+CREATE TABLE PSYCHOLOGICAL_CONFLICT (
+  conflictId INT PRIMARY KEY,
+  egoDecisionId INT NOT NULL,
+  conflictType VARCHAR(30) CHECK (conflictType IN ('Id vs Superego', 'Id vs Reality', 'Superego vs Reality')),
+  resolutionMethod VARCHAR(100),
+  isResolved BIT DEFAULT 0,
+  resolutionDate DATETIME,
+  FOREIGN KEY (egoDecisionId) REFERENCES EGO_DECISION(egoDecisionId)
+);
+
+-- DEFENSE_MECHANISM_CATALOG table
+CREATE TABLE DEFENSE_MECHANISM_CATALOG (
+  mechanismId INT PRIMARY KEY,
+  mechanismName VARCHAR(50) NOT NULL,
+  maturityLevel VARCHAR(20) CHECK (maturityLevel IN ('Primitive', 'Neurotic', 'Mature')),
+  effectiveness DECIMAL(3,2) CHECK (effectiveness BETWEEN 0 AND 10),
+  description VARCHAR(500)
+);
+
+-- ========================================
+-- INSERT SAMPLE DATA
+-- ========================================
+
+-- Insert Id Components (primitive drives)
+INSERT INTO ID_COMPONENT (idComponentId, driveName, driveType, intensity, description, isConscious)
+VALUES 
+  (1, 'Hunger Drive', 'Life Instinct', 8.5, 'Basic biological need for food and sustenance', 1),
+  (2, 'Sexual Drive', 'Life Instinct', 7.0, 'Libido and reproductive instincts', 0),
+  (3, 'Aggression', 'Death Instinct', 6.5, 'Destructive and aggressive impulses', 0),
+  (4, 'Pleasure Seeking', 'Life Instinct', 9.0, 'Desire for immediate gratification and pleasure', 1),
+  (5, 'Self-Preservation', 'Life Instinct', 9.5, 'Instinct to protect oneself from harm', 1);
+
+-- Insert Superego Components (moral rules)
+INSERT INTO SUPEREGO_COMPONENT (superegoComponentId, moralRule, ruleType, strictness, origin, description)
+VALUES 
+  (1, 'Thou shall not steal', 'Conscience', 9.0, 'Parental', 'Prohibition against taking what belongs to others'),
+  (2, 'Be productive and successful', 'Ego Ideal', 8.0, 'Cultural', 'Internalized ideal of achievement and success'),
+  (3, 'Control your anger', 'Conscience', 7.5, 'Parental', 'Moral prohibition against aggressive behavior'),
+  (4, 'Be selfless and help others', 'Ego Ideal', 8.5, 'Religious', 'Ideal of altruism and compassion'),
+  (5, 'Maintain proper social behavior', 'Conscience', 7.0, 'Cultural', 'Social norms and etiquette expectations');
+
+-- Insert Ego Decisions (mediating between Id and Superego)
+INSERT INTO EGO_DECISION (egoDecisionId, decisionName, idComponentId, superegoComponentId, realityConstraint, defenseMechanism, outcome, anxietyLevel, timestamp)
+VALUES 
+  (1, 'Delayed gratification at work', 4, 2, 'Must complete work before taking break', 'Sublimation', 'Channeled pleasure-seeking into productive work', 3.5, '2024-01-15 09:30:00'),
+  (2, 'Managing workplace conflict', 3, 3, 'Professional environment requires civility', 'Rationalization', 'Justified anger as "standing up for principles"', 5.0, '2024-01-20 14:15:00'),
+  (3, 'Resisting temptation to steal', 4, 1, 'Legal and moral consequences too severe', 'Suppression', 'Consciously decided not to take unattended item', 6.5, '2024-02-05 11:00:00'),
+  (4, 'Career vs family time', 2, 4, 'Limited time and energy resources', 'Compromise', 'Negotiated balanced schedule between work and family', 4.0, '2024-02-10 18:30:00'),
+  (5, 'Expressing frustration appropriately', 3, 5, 'Social norms forbid public outbursts', 'Displacement', 'Redirected anger to gym workout instead of confrontation', 4.5, '2024-02-15 17:00:00');
+
+-- Insert Psychological Conflicts
+INSERT INTO PSYCHOLOGICAL_CONFLICT (conflictId, egoDecisionId, conflictType, resolutionMethod, isResolved, resolutionDate)
+VALUES 
+  (1, 1, 'Id vs Superego', 'Found productive outlet (sublimation)', 1, '2024-01-15 10:00:00'),
+  (2, 2, 'Id vs Reality', 'Cognitive reframing through rationalization', 1, '2024-01-20 15:00:00'),
+  (3, 3, 'Id vs Superego', 'Conscious suppression with moral reasoning', 1, '2024-02-05 11:30:00'),
+  (4, 4, 'Superego vs Reality', 'Compromise formation', 1, '2024-02-10 19:00:00'),
+  (5, 5, 'Id vs Reality', 'Displacement to socially acceptable outlet', 1, '2024-02-15 18:00:00');
+
+-- Insert Defense Mechanisms
+INSERT INTO DEFENSE_MECHANISM_CATALOG (mechanismId, mechanismName, maturityLevel, effectiveness, description)
+VALUES 
+  (1, 'Repression', 'Primitive', 4.0, 'Unconscious blocking of unacceptable thoughts or impulses'),
+  (2, 'Denial', 'Primitive', 3.0, 'Refusal to accept reality or facts'),
+  (3, 'Projection', 'Primitive', 3.5, 'Attributing one''s own unacceptable thoughts to others'),
+  (4, 'Rationalization', 'Neurotic', 6.0, 'Creating logical explanations for irrational behavior'),
+  (5, 'Displacement', 'Neurotic', 6.5, 'Redirecting emotions to a safer substitute target'),
+  (6, 'Sublimation', 'Mature', 9.0, 'Channeling unacceptable impulses into socially acceptable activities'),
+  (7, 'Suppression', 'Mature', 8.5, 'Consciously choosing to delay attention to an impulse'),
+  (8, 'Humor', 'Mature', 8.0, 'Using comedy to express uncomfortable feelings');
+
+-- ========================================
+-- EXAMPLE QUERIES
+-- ========================================
+
+-- 1. View all ego decisions with their associated id and superego components
+SELECT 
+  ed.decisionName,
+  ic.driveName AS IdDrive,
+  ic.driveType,
+  ic.intensity AS IdIntensity,
+  sc.moralRule AS SuperegoRule,
+  sc.strictness AS SuperegoStrictness,
+  ed.defenseMechanism,
+  ed.outcome,
+  ed.anxietyLevel
+FROM EGO_DECISION ed
+LEFT JOIN ID_COMPONENT ic ON ed.idComponentId = ic.idComponentId
+LEFT JOIN SUPEREGO_COMPONENT sc ON ed.superegoComponentId = sc.superegoComponentId
+ORDER BY ed.timestamp;
+
+-- 2. Find conflicts and their resolutions
+SELECT 
+  pc.conflictType,
+  ed.decisionName,
+  pc.resolutionMethod,
+  CASE WHEN pc.isResolved = 1 THEN 'Resolved' ELSE 'Ongoing' END AS Status,
+  ed.anxietyLevel
+FROM PSYCHOLOGICAL_CONFLICT pc
+JOIN EGO_DECISION ed ON pc.egoDecisionId = ed.egoDecisionId
+ORDER BY pc.isResolved, ed.anxietyLevel DESC;
+
+-- 3. Analyze defense mechanism usage
+SELECT 
+  ed.defenseMechanism,
+  dm.maturityLevel,
+  dm.effectiveness,
+  COUNT(*) AS UsageCount,
+  AVG(ed.anxietyLevel) AS AvgAnxietyLevel
+FROM EGO_DECISION ed
+JOIN DEFENSE_MECHANISM_CATALOG dm ON ed.defenseMechanism = dm.mechanismName
+GROUP BY ed.defenseMechanism, dm.maturityLevel, dm.effectiveness
+ORDER BY UsageCount DESC;
+
+-- 4. Identify strongest id drives
+SELECT 
+  driveName,
+  driveType,
+  intensity,
+  CASE WHEN isConscious = 1 THEN 'Conscious' ELSE 'Unconscious' END AS Awareness,
+  description
+FROM ID_COMPONENT
+ORDER BY intensity DESC;
+
+-- 5. Find strictest superego rules
+SELECT 
+  moralRule,
+  ruleType,
+  strictness,
+  origin,
+  description
+FROM SUPEREGO_COMPONENT
+ORDER BY strictness DESC;
+
+-- ========================================
+-- COMPLEX QUERIES WITH CTEs
+-- ========================================
+
+-- 6. Psychodynamic conflict analysis
+WITH ConflictSummary AS (
+  SELECT 
+    pc.conflictType,
+    COUNT(*) AS conflictCount,
+    AVG(ed.anxietyLevel) AS avgAnxiety,
+    SUM(CASE WHEN pc.isResolved = 1 THEN 1 ELSE 0 END) AS resolvedCount
+  FROM PSYCHOLOGICAL_CONFLICT pc
+  JOIN EGO_DECISION ed ON pc.egoDecisionId = ed.egoDecisionId
+  GROUP BY pc.conflictType
+)
+SELECT 
+  conflictType,
+  conflictCount,
+  resolvedCount,
+  conflictCount - resolvedCount AS unresolvedCount,
+  CAST(resolvedCount * 100.0 / conflictCount AS DECIMAL(5,2)) AS resolutionRate,
+  avgAnxiety
+FROM ConflictSummary
+ORDER BY conflictCount DESC;
+
+-- 7. Defense mechanism maturity progression
+WITH MechanismUsage AS (
+  SELECT 
+    dm.maturityLevel,
+    dm.mechanismName,
+    dm.effectiveness,
+    COUNT(ed.egoDecisionId) AS usageCount
+  FROM DEFENSE_MECHANISM_CATALOG dm
+  LEFT JOIN EGO_DECISION ed ON dm.mechanismName = ed.defenseMechanism
+  GROUP BY dm.maturityLevel, dm.mechanismName, dm.effectiveness
+)
+SELECT 
+  maturityLevel,
+  mechanismName,
+  effectiveness,
+  usageCount,
+  CASE 
+    WHEN maturityLevel = 'Mature' AND usageCount > 0 THEN 'Healthy Coping'
+    WHEN maturityLevel = 'Neurotic' AND usageCount > 0 THEN 'Moderate Coping'
+    WHEN maturityLevel = 'Primitive' AND usageCount > 0 THEN 'Needs Development'
+    ELSE 'Unused Mechanism'
+  END AS PsychologicalHealth
+FROM MechanismUsage
+ORDER BY 
+  CASE maturityLevel 
+    WHEN 'Mature' THEN 1 
+    WHEN 'Neurotic' THEN 2 
+    WHEN 'Primitive' THEN 3 
+  END,
+  usageCount DESC;
+
+-- 8. Id-Ego-Superego balance analysis
+WITH ComponentActivity AS (
+  SELECT 
+    ic.driveName,
+    ic.intensity AS idIntensity,
+    sc.moralRule,
+    sc.strictness AS superegoStrictness,
+    ed.anxietyLevel,
+    ed.defenseMechanism
+  FROM EGO_DECISION ed
+  JOIN ID_COMPONENT ic ON ed.idComponentId = ic.idComponentId
+  JOIN SUPEREGO_COMPONENT sc ON ed.superegoComponentId = sc.superegoComponentId
+)
+SELECT 
+  driveName,
+  idIntensity,
+  moralRule,
+  superegoStrictness,
+  idIntensity - superegoStrictness AS tensionDifference,
+  anxietyLevel,
+  defenseMechanism,
+  CASE 
+    WHEN ABS(idIntensity - superegoStrictness) < 2 THEN 'Balanced'
+    WHEN idIntensity > superegoStrictness THEN 'Id-Dominant'
+    ELSE 'Superego-Dominant'
+  END AS PsychicBalance
+FROM ComponentActivity
+ORDER BY ABS(idIntensity - superegoStrictness) DESC;
+
+-- 9. Temporal pattern analysis of ego decisions
+WITH DecisionTimeline AS (
+  SELECT 
+    DATEPART(hour, timestamp) AS hourOfDay,
+    COUNT(*) AS decisionCount,
+    AVG(anxietyLevel) AS avgAnxiety,
+    STRING_AGG(defenseMechanism, ', ') AS mechanismsUsed
+  FROM EGO_DECISION
+  GROUP BY DATEPART(hour, timestamp)
+)
+SELECT 
+  hourOfDay,
+  decisionCount,
+  avgAnxiety,
+  mechanismsUsed,
+  CASE 
+    WHEN avgAnxiety > 6 THEN 'High Stress Period'
+    WHEN avgAnxiety BETWEEN 4 AND 6 THEN 'Moderate Stress'
+    ELSE 'Low Stress Period'
+  END AS StressLevel
+FROM DecisionTimeline
+ORDER BY hourOfDay;
+
+-- 10. Comprehensive psychodynamic profile
+WITH IdProfile AS (
+  SELECT 
+    AVG(intensity) AS avgIdIntensity,
+    COUNT(CASE WHEN isConscious = 1 THEN 1 END) AS consciousDrives,
+    COUNT(CASE WHEN isConscious = 0 THEN 1 END) AS unconsciousDrives
+  FROM ID_COMPONENT
+),
+SuperegoProfile AS (
+  SELECT 
+    AVG(strictness) AS avgSuperegoStrictness,
+    COUNT(CASE WHEN ruleType = 'Conscience' THEN 1 END) AS conscienceRules,
+    COUNT(CASE WHEN ruleType = 'Ego Ideal' THEN 1 END) AS egoIdealRules
+  FROM SUPEREGO_COMPONENT
+),
+EgoProfile AS (
+  SELECT 
+    COUNT(*) AS totalDecisions,
+    AVG(anxietyLevel) AS avgAnxiety,
+    COUNT(DISTINCT defenseMechanism) AS uniqueMechanisms
+  FROM EGO_DECISION
+)
+SELECT 
+  ip.avgIdIntensity,
+  ip.consciousDrives,
+  ip.unconsciousDrives,
+  sp.avgSuperegoStrictness,
+  sp.conscienceRules,
+  sp.egoIdealRules,
+  ep.totalDecisions,
+  ep.avgAnxiety,
+  ep.uniqueMechanisms,
+  CASE 
+    WHEN ip.avgIdIntensity > sp.avgSuperegoStrictness THEN 'More impulsive personality structure'
+    WHEN ip.avgIdIntensity < sp.avgSuperegoStrictness THEN 'More controlled personality structure'
+    ELSE 'Balanced personality structure'
+  END AS PersonalityStructure
+FROM IdProfile ip, SuperegoProfile sp, EgoProfile ep;
